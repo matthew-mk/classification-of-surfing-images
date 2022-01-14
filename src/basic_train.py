@@ -1,9 +1,13 @@
 from utils import *
 from tensorflow import keras
 from keras import layers
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+import numpy as np
 
-BASIC_IMAGES_DIR = 'images/basic'
+BASIC_IMAGES_DIR = 'datasets/binary_1'
 CATEGORIES = ['unsurfable', 'surfable']
 COLOR_MODE = 'rgb'
 NUM_CHANNELS = get_channels(COLOR_MODE)
@@ -11,14 +15,26 @@ IMAGE_HEIGHT = 40
 IMAGE_WIDTH = 40
 IMAGE_SIZE = (IMAGE_HEIGHT, IMAGE_WIDTH)
 BATCH_SIZE = 16
-EPOCHS = 300
+EPOCHS = 200
 
-# Set up the images array (X) and labels array (y)
 X, y = extract_images_and_labels(BASIC_IMAGES_DIR, CATEGORIES, COLOR_MODE, IMAGE_SIZE)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=3)
+
+svm_model = SVC(C=4)
+rf_model = RandomForestClassifier()
+knn_model = KNeighborsClassifier(n_neighbors=1)
+svm_model.fit(X_train, y_train)
+rf_model.fit(X_train, y_train)
+knn_model.fit(X_train, y_train)
+print('\nSVM Model')
+test_model(svm_model, False, X_test, y_test)
+print('\nRF Model')
+test_model(rf_model, False, X_test, y_test)
+print('\nKNN Model')
+test_model(knn_model, False, X_test, y_test)
+
 X, y = np.array(X), np.array(y)
 X = X.reshape(len(X), IMAGE_HEIGHT, IMAGE_WIDTH, NUM_CHANNELS)
-
-# Set up the training, validation, and test datasets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=3)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=1)
 
@@ -54,12 +70,13 @@ model.compile(
     metrics=['accuracy']
 )
 
-model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
-    'models/basic_cnn2.h5',
-    monitor='val_loss',
-    mode='min',
-    save_best_only=True
-)
+
+# model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
+#     'saved_models/basic_cnn2.h5',
+#     monitor='val_loss',
+#     mode='min',
+#     save_best_only=True
+# )
 
 history = model.fit(
     X_train,
@@ -67,14 +84,12 @@ history = model.fit(
     validation_data=(X_val, y_val),
     epochs=EPOCHS,
     batch_size=BATCH_SIZE,
-    callbacks=[model_checkpoint_callback]
+    # callbacks=[model_checkpoint_callback]
 )
 
-plot_cnn_loss(history, EPOCHS)
-plot_cnn_accuracy(history, EPOCHS)
-cnn_model_accuracy_and_loss(model, X_val, y_val, X_test, y_test)
-
-# loaded_model = keras.models.load_model('models/basic_cnn.h5')
-# cnn_model_accuracy_and_loss(loaded_model, X_val, y_val, X_test, y_test)
-
+# loaded_model = keras.classes.load_model('saved_models/basic_cnn.h5')
+# test_model(loaded_model, True, X_val, y_val)
+# print('\nCNN Model')
+# test_model(loaded_model, True, X_test, y_test)
 # loaded_model.summary()
+
