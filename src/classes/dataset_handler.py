@@ -39,6 +39,7 @@ class DatasetHandler:
         """
         self.X = []
         self.y = []
+        print('Loading dataset...')
         for category in categories:
             category_path = os.path.join(path_to_dir, category)
             category_label = categories.index(category)
@@ -52,6 +53,7 @@ class DatasetHandler:
                     img_array = img_array / 255  # normalize the data
                     self.X.append(img_array)
                     self.y.append(category_label)
+        print('Dataset loaded')
 
     def train_test_split(self):
         """Splits the dataset (X and y) into datasets that can be used for training and testing.
@@ -141,7 +143,7 @@ class CNNDatasetHandler(DatasetHandler):
     def train_test_split(self, test_size, train_test_seed, val_seed):
         """Splits the dataset (X and y) into datasets that can be used for training, validation and testing.
 
-        Arguments:
+        Args:
             test_size (float): The proportion of the dataset that will be used for testing. Ranges from 0-1.
             train_test_seed (int): A reproducible shuffle of the training and testing data.
             val_seed (int): A reproducible shuffle of the validation data.
@@ -179,7 +181,7 @@ class SKLearnDatasetHandler(DatasetHandler):
     def train_test_split(self, test_size, seed):
         """Splits the dataset (X and y) into datasets that can be used for training and testing.
 
-        Arguments:
+        Args:
             test_size (float): The proportion of the dataset that will be used for testing. Ranges from 0 - 1.
             seed (int): A reproducible shuffle of the dataset.
 

@@ -1,4 +1,5 @@
 from classes.cnn import *
+from classes.sklearn import *
 from classes.dataset_handler import *
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
@@ -20,9 +21,7 @@ CONFIG = {
 
 def cnn_test():
     cnn_dataset_handler = CNNDatasetHandler(CONFIG)
-    print('Loading dataset...')
     cnn_dataset_handler.load_dataset(IMAGES_DIR_1, CATEGORIES)
-    print('Dataset loaded')
     X_train, X_val, X_test, y_train, y_val, y_test = cnn_dataset_handler.train_test_split(TEST_SIZE, TRAIN_SEED,
                                                                                           VAL_SEED)
     cnn = BasicCNN(CONFIG)
@@ -34,19 +33,23 @@ def cnn_test():
 
 def sklearn_test():
     sklearn_dataset_handler = SKLearnDatasetHandler(CONFIG)
-    print('Loading dataset...')
     sklearn_dataset_handler.load_dataset(IMAGES_DIR_1, CATEGORIES)
-    print('Dataset loaded')
     X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(TEST_SIZE, TRAIN_SEED)
-    svm_model = SVC(C=4)
-    rf_model = RandomForestClassifier()
-    knn_model = KNeighborsClassifier(n_neighbors=1)
-    svm_model.fit(X_train, y_train)
-    rf_model.fit(X_train, y_train)
-    knn_model.fit(X_train, y_train)
-    test_model(svm_model, False, X_test, y_test)
-    test_model(rf_model, False, X_test, y_test)
-    test_model(knn_model, False, X_test, y_test)
+
+    svm = SKLearn(SVC(C=4))
+    rf = SKLearn(RandomForestClassifier())
+    knn = SKLearn(KNeighborsClassifier(n_neighbors=1))
+
+    svm.train_model(X_train, y_train)
+    rf.train_model(X_train, y_train)
+    knn.train_model(X_train, y_train)
+
+    print('SVM Model')
+    svm.test_model(X_test, y_test)
+    print('RF Model')
+    rf.test_model(X_test, y_test)
+    print('KNN Model')
+    knn.test_model(X_test, y_test)
 
 
 def main():

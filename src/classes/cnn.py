@@ -2,6 +2,7 @@ from utils import *
 from tensorflow import keras
 from keras import layers
 from keras.callbacks import History
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -11,9 +12,9 @@ class CNN:
 
     """
     def __init__(self, config):
-        """
+        """The constructor for a CNN model.
 
-        Arguments:
+        Args:
             config ():
 
         """
@@ -123,17 +124,17 @@ class CNN:
         plt.legend()
         plt.show()
 
-    def test_model(self, images, labels):
+    def test_model(self, X_test, y_test):
         """Tests the model on a dataset and prints the accuracy, number of correct predictions, and loss.
 
         Args:
-            images (np.ndarray): The images in the dataset, where each image is represented as a pixel array.
-            labels (np.ndarray): The labels in the dataset.
+            X_test (np.ndarray): The images in the dataset, where each image is represented as a pixel array.
+            y_test (np.ndarray): The labels in the dataset.
 
         """
-        loss, acc = self.model.evaluate(images, labels, verbose=0)
+        loss, acc = self.model.evaluate(X_test, y_test, verbose=0)
         print('Accuracy: {}%'.format((round(acc * 100, 2))))
-        print('Number of correct predictions: {}/{}'.format(round(len(images) * acc), len(images)))
+        print('Number of correct predictions: {}/{}'.format(round(len(X_test) * acc), len(X_test)))
         print('Loss: {}'.format(round(loss, 6)))
 
     def save_model(self, model_name):
@@ -143,7 +144,7 @@ class CNN:
             model_name (str): The name the model will be saved as, e.g. 'basic_cnn'.
 
         """
-        self.model = keras.models.save('../saved_models/{}.h5'.format(model_name))
+        self.model.save('../saved_models/{}.h5'.format(model_name))
         self.model_name = model_name
 
     def load_model(self, model_name):
@@ -160,6 +161,19 @@ class CNN:
         """Prints information about the CNN model and its structure."""
         self.model.summary()
 
+    def kfold_cross_validation(self, X, y, folds):
+        """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
+
+        Note: This function will only return legitimate results if the model has not been trained on the dataset that is
+        used.
+
+        Args:
+            X (np.ndarray): The images in the dataset, where each image is represented as a list of pixel values.
+            y (np.ndarray): The labels of the images.
+            folds (int): The number of folds the dataset will be divided into.
+
+        """
+
 
 class LoadedCNN(CNN):
     """
@@ -168,7 +182,7 @@ class LoadedCNN(CNN):
     def __init__(self, config, model_name):
         """
 
-        Arguments:
+        Args:
             config ():
             model_name (str): The name of the model to be loaded.
 
