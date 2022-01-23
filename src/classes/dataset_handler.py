@@ -1,15 +1,23 @@
 from utils import *
 from tensorflow import keras
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot
+import numpy as np
 import os
+
+"""
+
+"""
 
 
 class DatasetHandler:
-    """
-
-    """
+    """The base class for handling datasets."""
     def __init__(self, config):
-        """
+        """Initialises the constraints that will be applied to the images in the datasets that are used.
+
+        Args:
+            config (dict): The constraints that will be applied to the images, including the image height, image width,
+                color mode, and number of channels.
 
         """
         self.image_height = config['image_height']
@@ -21,17 +29,17 @@ class DatasetHandler:
         self.X_train, self.y_train = [], []
         self.X_test, self.y_test = [], []
 
-    def load_dataset(self, path_to_dir, categories):
-        """Loads the images from a dataset, assigns a label to each image, and does some preprocessing.
+    def create_dataset(self, dataset_names, categories):
+        """Loads images from one or more datasets, does some preprocessing, and merges them into one dataset.
 
-        The names of the folders that are specified in the categories array are looped through inside of the
-        directory, with each folder containing the images for a particular class. Each image is assigned a label (the
-        index of the name of the folder in the categories array) and converted to be the size and color mode that are
-        defined by this class. In addition, each image is transformed into a numpy array containing the image's pixel
-        values and the pixel values are normalized.
+        Each image is assigned a label and converted to be the size and color mode defined by this class. In addition,
+        each image is transformed into a numpy array containing the image's pixel values and the pixel values are
+        normalized.
+
+        Note: If more than one dataset is used, it should be ensured that each one contains the same categories.
 
         Args:
-            path_to_dir (str): The path to the dataset.
+            dataset_names (list[str]): The names of the datasets to be loaded.
             categories (list[str]): An array containing the names of the folders in the directory that have the images.
                 Each folder should contain the images for a separate class. The index of each item in the array
                 represents the label that category will be given.
@@ -39,21 +47,23 @@ class DatasetHandler:
         """
         self.X = []
         self.y = []
-        print('Loading dataset...')
-        for category in categories:
-            category_path = os.path.join(path_to_dir, category)
-            category_label = categories.index(category)
-            for file in os.listdir(category_path):
-                if file.endswith('.png'):
-                    img_path = os.path.join(category_path, file)
-                    img = keras.preprocessing.image.load_img(img_path,
-                                                             color_mode=self.color_mode,
-                                                             target_size=self.image_size)
-                    img_array = np.array(img).flatten()
-                    img_array = img_array / 255  # normalize the data
-                    self.X.append(img_array)
-                    self.y.append(category_label)
-        print('Dataset loaded')
+        if len(dataset_names) > 0:
+            for dataset_name in dataset_names:
+                print(f'Loading images from {dataset_name}...')
+                for category in categories:
+                    category_path = os.path.join(f"../datasets/{dataset_name}", category)
+                    category_label = categories.index(category)
+                    for file in os.listdir(category_path):
+                        if file.endswith('.png'):
+                            img_path = os.path.join(category_path, file)
+                            img = keras.preprocessing.image.load_img(img_path,
+                                                                     color_mode=self.color_mode,
+                                                                     target_size=self.image_size)
+                            img_array = np.array(img).flatten()
+                            img_array = img_array / 255  # normalize the data
+                            self.X.append(img_array)
+                            self.y.append(category_label)
+            print('Dataset created')
 
     def train_test_split(self):
         """Splits the dataset (X and y) into datasets that can be used for training and testing.
@@ -130,11 +140,13 @@ class DatasetHandler:
 
 
 class CNNDatasetHandler(DatasetHandler):
-    """
-
-    """
+    """Sets up datasets for Keras CNN models."""
     def __init__(self, config):
-        """
+        """Initialises the constraints that will be applied to the images in the datasets that are used.
+
+        Args:
+            config (dict): The constraints that will be applied to the images, including the image height, image width,
+                color mode, and number of channels.
 
         """
         super().__init__(config)
@@ -168,12 +180,14 @@ class CNNDatasetHandler(DatasetHandler):
         return self.X_train, self.X_val, self.X_test, self.y_train, self.y_val, self.y_test
 
 
-class SKLearnDatasetHandler(DatasetHandler):
-    """
-
-    """
+class SklearnDatasetHandler(DatasetHandler):
+    """Sets up datasets for Scikit-learn models."""
     def __init__(self, config):
-        """
+        """Initialises the constraints that will be applied to the images in the datasets that are used.
+
+        Args:
+            config (dict): The constraints that will be applied to the images, including the image height, image width,
+                color mode, and number of channels.
 
         """
         super().__init__(config)
@@ -195,5 +209,3 @@ class SKLearnDatasetHandler(DatasetHandler):
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=test_size,
                                                                                 random_state=seed)
         return self.X_train, self.X_test, self.y_train, self.y_test
-
-

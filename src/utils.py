@@ -1,5 +1,4 @@
-from sklearn.model_selection import cross_val_score, cross_validate
-import numpy as np
+"""Contains utility functions."""
 
 
 def get_channels(color_mode):

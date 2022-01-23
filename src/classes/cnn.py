@@ -2,20 +2,21 @@ from utils import *
 from tensorflow import keras
 from keras import layers
 from keras.callbacks import History
+from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 class CNN:
-    """The base class of a CNN model.
+    """A class for creating, training, and evaluating a Keras CNN model."""
 
-
-    """
     def __init__(self, config):
-        """The constructor for a CNN model.
+        """Initialises information about the images and variables for training.
 
         Args:
-            config ():
+            config (dict): Contains information about the images, including the image height, image width, color mode,
+                and number of channels. It also includes variables that are used for training, such as the batch size
+                and number of epochs.
 
         """
         self.image_height = config['image_height']
@@ -26,18 +27,8 @@ class CNN:
         self.batch_size = config['batch_size']
         self.epochs = config['epochs']
         self.history = History()
-        self.model = None
         self.model_name = 'unnamed_cnn'
-        self.create_model()
-
-    def create_model(self):
-        """Creates the architecture of the CNN model.
-
-        Raises:
-            NotImplementedError: Subclasses must implement this method.
-
-        """
-        raise NotImplementedError
+        self.model = None
 
     def get_model(self):
         """Returns the CNN model.
@@ -48,34 +39,50 @@ class CNN:
         """
         return self.model
 
-    def get_model_name(self):
-        """Returns the name of the current model.
+    def print_model_name(self):
+        """Prints the name of the current model."""
+        print('\n' + self.model_name)
 
-        Returns:
-            The name of the model.
+    def create_cnn(self):
+        """Creates an implementation of a CNN model and compiles it."""
+        self.model_name = 'basic_cnn'
+        data_augmentation = keras.Sequential([
+            layers.RandomFlip("horizontal", input_shape=(self.image_height, self.image_width, self.num_channels)),
+            layers.RandomRotation(0.1),
+            layers.RandomZoom(0.1),
+        ])
+        self.model = keras.Sequential([
+            data_augmentation,
+            layers.Input((self.image_height, self.image_width, self.num_channels)),
+            layers.Conv2D(16, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(32, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(64, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(128, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(128, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Dropout(0.2),
+            layers.Flatten(),
+            layers.Dense(128),
+            layers.Dense(64),
+            layers.Dense(1)
+        ])
+        self.model.compile(
+            optimizer=keras.optimizers.Adam(),
+            loss=keras.losses.BinaryCrossentropy(from_logits=True),
+            metrics=['accuracy']
+        )
 
-        """
-        return self.model_name
-
-    def compile_model(self, optimizer, loss, metrics):
-        """Compiles the CNN model using the specified optimizer, loss function, and metrics.
-
-        Args:
-            optimizer (keras.optimizers.Optimizer): The optimizer.
-            loss (keras.losses.Loss): The loss function.
-            metrics (list[keras.metrics.Metric]): A list of metrics that the model will evaluate during training and
-                testing.
-
-        """
-        self.model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
-
-    def train_model(self, X_train, y_train, X_val, y_val, save_name=None):
+    def train_model(self, X_train, X_val, y_train, y_val, save_name=None):
         """Trains the model using training and validation data. The best model during training can optionally be saved.
 
         Args:
             X_train (np.ndarray): The training dataset images. Each image is represented as a pixel array.
-            y_train (np.ndarray): The training dataset labels.
             X_val (np.ndarray): The validation dataset images. Each image is represented as a pixel array.
+            y_train (np.ndarray): The training dataset labels.
             y_val (np.ndarray): The validation dataset labels.
             save_name (str): Optional parameter. If included, the best model during training will be saved using this
                 name. Defaults to None.
@@ -133,6 +140,7 @@ class CNN:
 
         """
         loss, acc = self.model.evaluate(X_test, y_test, verbose=0)
+        self.print_model_name()
         print('Accuracy: {}%'.format((round(acc * 100, 2))))
         print('Number of correct predictions: {}/{}'.format(round(len(X_test) * acc), len(X_test)))
         print('Loss: {}'.format(round(loss, 6)))
@@ -161,7 +169,7 @@ class CNN:
         """Prints information about the CNN model and its structure."""
         self.model.summary()
 
-    def kfold_cross_validation(self, X, y, folds):
+    def kfold_cross_validation(self, X, y, n_splits, test_size):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
 
         Note: This function will only return legitimate results if the model has not been trained on the dataset that is
@@ -170,75 +178,38 @@ class CNN:
         Args:
             X (np.ndarray): The images in the dataset, where each image is represented as a list of pixel values.
             y (np.ndarray): The labels of the images.
-            folds (int): The number of folds the dataset will be divided into.
+            n_splits (int): The number of folds the dataset will be divided into.
+            test_size (float): The proportion of the dataset that will be used for testing. Ranges from 0-1.
 
         """
+        fold_num = 1
+        X = np.array(X)
+        y = np.array(y)
+        accuracy_scores = []
+        skf = StratifiedShuffleSplit(n_splits=n_splits, test_size=test_size)
 
+        for train_index, test_index in skf.split(X, y):
+            X = X.reshape(len(X), self.image_height, self.image_width, self.num_channels)
+            X_train, X_test = X[train_index], X[test_index]
+            y_train, y_test = y[train_index], y[test_index]
+            X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=test_size)
+            print(f'Training on fold {fold_num}')
+            model_clone = self.model
+            model_clone.fit(
+                X_train,
+                y_train,
+                validation_data=(X_val, y_val),
+                epochs=self.epochs,
+                batch_size=self.batch_size
+            )
+            loss, acc = model_clone.evaluate(X_test, y_test, verbose=0)
+            accuracy_scores.append(acc)
+            print(f'\nFold {fold_num} results:')
+            print(f'Test loss: {loss}')
+            print(f'Test accuracy: {acc}\n')
+            fold_num += 1
 
-class LoadedCNN(CNN):
-    """
-
-    """
-    def __init__(self, config, model_name):
-        """
-
-        Args:
-            config ():
-            model_name (str): The name of the model to be loaded.
-
-        """
-        self.image_height = config['image_height']
-        self.image_width = config['image_width']
-        self.image_size = (self.image_height, self.image_width)
-        self.color_mode = config['color_mode']
-        self.num_channels = get_channels(self.color_mode)
-        self.batch_size = config['batch_size']
-        self.epochs = config['epochs']
-        self.history = History()
-        self.model = None
-        self.model_name = model_name
-        self.create_model()
-
-    def create_model(self):
-        """Creates the architecture of the CNN model."""
-        self.load_model(self.model_name)
-        return self.model
-
-
-class BasicCNN(CNN):
-    """
-
-    """
-    def __init__(self, config):
-        """
-
-        """
-        super().__init__(config)
-        self.compile_model(keras.optimizers.Adam(), keras.losses.BinaryCrossentropy(from_logits=True), ['accuracy'])
-
-    def create_model(self):
-        """Creates the architecture of the CNN model."""
-        data_augmentation = keras.Sequential([
-            layers.RandomFlip("horizontal", input_shape=(self.image_height, self.image_width, self.num_channels)),
-            layers.RandomRotation(0.1),
-            layers.RandomZoom(0.1),
-        ])
-        self.model = keras.Sequential([
-            data_augmentation,
-            layers.Input((self.image_height, self.image_width, self.num_channels)),
-            layers.Conv2D(16, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(32, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(64, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(128, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(128, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Dropout(0.2),
-            layers.Flatten(),
-            layers.Dense(128),
-            layers.Dense(64),
-            layers.Dense(1)
-        ])
+        print(f'{n_splits}-Fold Cross Validation: {self.model_name}')
+        print('Max accuracy: {}% '.format(round(np.max(accuracy_scores) * 100, 2)))
+        print('Min accuracy: {}% '.format(round(np.min(accuracy_scores) * 100, 2)))
+        print('Average accuracy: {}% '.format(round(np.average(accuracy_scores) * 100, 2)))

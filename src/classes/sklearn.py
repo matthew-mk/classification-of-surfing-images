@@ -1,42 +1,59 @@
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import cross_validate
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
 import seaborn as sn
 import numpy as np
 import pickle
 
 
-class SKLearn:
-    """
-
-    """
-    def __init__(self, model):
-        """The constructor for a SciKit Learn model.
-
-        Args:
-            model (): The model to be used by this class.
-
-        """
-        self.model_name = 'sklearn_model'
-        self.model = model
+class Sklearn:
+    """A class for creating, training, and evaluating a Scikit-learn model."""
+    def __init__(self):
+        """Initializes a Scikit-learn model."""
+        self.model = None
+        self.model_name = 'unnamed_model'
 
     def get_model(self):
-        """Returns the SciKit Learn model.
+        """Returns the Scikit-learn model.
 
         Returns:
-            The SciKit Learn model.
+            The Scikit-learn model.
 
         """
         return self.model
 
-    def get_model_name(self):
-        """Returns the name of the current model.
+    def print_model_name(self):
+        """Prints the name of the current model."""
+        print('\n' + self.model_name)
 
-        Returns:
-            The name of the model.
+    def create_svm(self):
+        """Creates an implementation of a Scikit-learn SVM model where C=4."""
+        self.model = SVC(C=4)
+        self.model_name = 'basic_svm'
+
+    def create_rf(self):
+        """Creates a default Scikit-learn Random Forest model."""
+        self.model = RandomForestClassifier()
+        self.model_name = 'basic_rf'
+
+    def create_knn(self):
+        """Creates an implementation of a Scikit-learn KNN model which uses 1 neighbour."""
+        self.model = KNeighborsClassifier(n_neighbors=1)
+        self.model_name = 'basic_knn'
+
+    def create_custom_model(self, model, model_name):
+        """Allows a custom Scikit-learn model to be passed in as a parameter.
+
+        Args:
+            model: The Scikit-learn model.
+            model_name (str): The name of the model.
 
         """
-        return self.model_name
+        self.model = model
+        self.model_name = model_name
 
     def train_model(self, X_train, y_train):
         """Trains the model using a training dataset.
@@ -57,6 +74,7 @@ class SKLearn:
 
         """
         acc = self.model.score(X_test, y_test)
+        self.print_model_name()
         print('Accuracy: {}%'.format(round(acc * 100, 2)))
         print('Number of correct predictions: {}/{}'.format(round(len(X_test) * acc), len(X_test)))
 
@@ -96,7 +114,7 @@ class SKLearn:
         self.model = pickle.load(open('../saved_models/{}.sav'.format(model_name), 'rb'))
         self.model_name = model_name
 
-    def kfold_cross_validation(self, X, y, folds):
+    def kfold_cross_validation(self, X, y, n_splits):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
 
         Note: This function will only return legitimate results if the model has not been trained on the dataset that is
@@ -105,11 +123,12 @@ class SKLearn:
         Args:
             X (list[list]): The images in the dataset, where each image is represented as a list of pixel values.
             y (list[int]): The labels of the images.
-            folds (int): The number of folds the dataset will be divided into.
+            n_splits (int): The number of folds the dataset will be divided into.
 
         """
+        print(f'\n{n_splits}-Fold Cross Validation: {self.model_name}')
         scoring_types = ['accuracy', 'precision', 'recall', 'f1']
-        cv_results = cross_validate(self.model, X, y, cv=folds, scoring=scoring_types)
+        cv_results = cross_validate(self.model, X, y, cv=n_splits, scoring=scoring_types)
         for scoring_type in scoring_types:
             cv_result = cv_results['test_{}'.format(scoring_type)]
             print('Max {}: {}% '.format(scoring_type, round(np.max(cv_result) * 100, 2)))
