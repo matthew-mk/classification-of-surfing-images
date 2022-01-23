@@ -10,7 +10,7 @@ CATEGORIES = ['unsurfable', 'surfable']
 TEST_SIZE = 0.2
 TRAIN_SEED = 3
 VAL_SEED = 1
-N_SPLITS = 4
+N_SPLITS = 3
 CONFIG = {
     'image_height': 40,
     'image_width': 40,

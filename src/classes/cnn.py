@@ -29,6 +29,9 @@ class CNN:
         self.history = History()
         self.model_name = 'unnamed_cnn'
         self.model = None
+        self.optimizer = None
+        self.loss = None
+        self.metrics = None
 
     def get_model(self):
         """Returns the CNN model.
@@ -70,11 +73,10 @@ class CNN:
             layers.Dense(64),
             layers.Dense(1)
         ])
-        self.model.compile(
-            optimizer=keras.optimizers.Adam(),
-            loss=keras.losses.BinaryCrossentropy(from_logits=True),
-            metrics=['accuracy']
-        )
+        self.optimizer = keras.optimizers.Adam()
+        self.loss = keras.losses.BinaryCrossentropy(from_logits=True)
+        self.metrics = ['accuracy']
+        self.model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
 
     def train_model(self, X_train, X_val, y_train, y_val, save_name=None):
         """Trains the model using training and validation data. The best model during training can optionally be saved.
@@ -189,26 +191,35 @@ class CNN:
         skf = StratifiedShuffleSplit(n_splits=n_splits, test_size=test_size)
 
         for train_index, test_index in skf.split(X, y):
+            # Set up training, validation, and test datasets for the current fold
             X = X.reshape(len(X), self.image_height, self.image_width, self.num_channels)
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
             X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=test_size)
+
+            # Create a clone of the current model and compile it
+            cloned_model = keras.models.clone_model(self.model)
+            cloned_model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
+
+            # Train the cloned model using the training and validation data
             print(f'Training on fold {fold_num}')
-            model_clone = self.model
-            model_clone.fit(
+            cloned_model.fit(
                 X_train,
                 y_train,
                 validation_data=(X_val, y_val),
                 epochs=self.epochs,
                 batch_size=self.batch_size
             )
-            loss, acc = model_clone.evaluate(X_test, y_test, verbose=0)
+
+            # Test the cloned model on the test data, then print the results
+            loss, acc = cloned_model.evaluate(X_test, y_test, verbose=0)
             accuracy_scores.append(acc)
             print(f'\nFold {fold_num} results:')
             print(f'Test loss: {loss}')
             print(f'Test accuracy: {acc}\n')
             fold_num += 1
 
+        # Print overall k-fold cross validation results
         print(f'{n_splits}-Fold Cross Validation: {self.model_name}')
         print('Max accuracy: {}% '.format(round(np.max(accuracy_scores) * 100, 2)))
         print('Min accuracy: {}% '.format(round(np.min(accuracy_scores) * 100, 2)))
