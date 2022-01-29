@@ -1,13 +1,12 @@
+"""This module contains a base class for handling datasets, along with multiple subclasses that handle datasets for
+models that are created using specific libraries."""
+
 from utils import *
 from tensorflow import keras
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot
 import numpy as np
 import os
-
-"""
-
-"""
 
 
 class DatasetHandler:
@@ -17,7 +16,7 @@ class DatasetHandler:
 
         Args:
             config (dict): The constraints that will be applied to the images, including the image height, image width,
-                color mode, and number of channels.
+                and color mode.
 
         """
         self.image_height = config['image_height']
@@ -36,13 +35,10 @@ class DatasetHandler:
         each image is transformed into a numpy array containing the image's pixel values and the pixel values are
         normalized.
 
-        Note: If more than one dataset is used, it should be ensured that each one contains the same categories.
-
         Args:
             dataset_names (list[str]): The names of the datasets to be loaded.
-            categories (list[str]): An array containing the names of the folders in the directory that have the images.
-                Each folder should contain the images for a separate class. The index of each item in the array
-                represents the label that category will be given.
+            categories (list[str]): The categories (also known as classes) in the datasets. Each dataset should have
+                the same categories.
 
         """
         self.X = []
@@ -146,7 +142,7 @@ class CNNDatasetHandler(DatasetHandler):
 
         Args:
             config (dict): The constraints that will be applied to the images, including the image height, image width,
-                color mode, and number of channels.
+                and color mode.
 
         """
         super().__init__(config)
@@ -187,7 +183,7 @@ class SklearnDatasetHandler(DatasetHandler):
 
         Args:
             config (dict): The constraints that will be applied to the images, including the image height, image width,
-                color mode, and number of channels.
+                and color mode.
 
         """
         super().__init__(config)

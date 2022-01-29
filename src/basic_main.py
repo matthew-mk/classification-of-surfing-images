@@ -1,16 +1,16 @@
+"""This module trains models to classify images based on whether they contain suitable conditions for surfing or not
+(binary classification). The models are trained using images from a single surfing location and evaluated using
+appropriate metrics."""
+
 from classes.cnn import *
 from classes.sklearn import *
 from classes.dataset_handler import *
-
-"""
-
-"""
 
 CATEGORIES = ['unsurfable', 'surfable']
 TEST_SIZE = 0.2
 TRAIN_SEED = 3
 VAL_SEED = 1
-N_SPLITS = 3
+KFOLD_SPLITS = 5
 CONFIG = {
     'image_height': 40,
     'image_width': 40,
@@ -71,7 +71,7 @@ def cnn_kfold_test():
     X, y = cnn_dataset_handler.get_X_and_y()
 
     # K-Fold Cross Validation
-    basic_cnn.kfold_cross_validation(X, y, N_SPLITS, TEST_SIZE)
+    basic_cnn.kfold_cross_validation(X, y, KFOLD_SPLITS, TEST_SIZE)
 
 
 def sklearn_kfold_test():
@@ -81,16 +81,16 @@ def sklearn_kfold_test():
     X, y = sklearn_dataset_handler.get_X_and_y()
 
     # K-Fold Cross Validation
-    basic_svm.kfold_cross_validation(X, y, N_SPLITS)
-    basic_rf.kfold_cross_validation(X, y, N_SPLITS)
-    basic_knn.kfold_cross_validation(X, y, N_SPLITS)
+    basic_svm.kfold_cross_validation(X, y, KFOLD_SPLITS)
+    basic_rf.kfold_cross_validation(X, y, KFOLD_SPLITS)
+    basic_knn.kfold_cross_validation(X, y, KFOLD_SPLITS)
 
 
 def main():
     # sklearn_test()
     # cnn_test()
-    # sklearn_kfold_test()
-    cnn_kfold_test()
+    sklearn_kfold_test()
+    # cnn_kfold_test()
 
 
 if __name__ == '__main__':

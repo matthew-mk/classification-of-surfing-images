@@ -1,4 +1,4 @@
-"""Contains utility functions."""
+"""This module contains utility functions."""
 
 
 def get_channels(color_mode):
