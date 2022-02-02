@@ -45,7 +45,7 @@ class DatasetHandler:
         self.y = []
         if len(dataset_names) > 0:
             for dataset_name in dataset_names:
-                print(f'Loading images from {dataset_name}...')
+                print(f'\nLoading images from {dataset_name}...')
                 for category in categories:
                     category_path = os.path.join(f"../datasets/{dataset_name}", category)
                     category_label = categories.index(category)

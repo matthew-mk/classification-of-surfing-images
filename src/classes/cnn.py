@@ -46,7 +46,7 @@ class CNN:
         """Prints the name of the current model."""
         print('\n' + self.model_name)
 
-    def create_cnn(self):
+    def create_basic_cnn(self):
         """Creates an implementation of a CNN model and compiles it."""
         self.model_name = 'basic_cnn'
         data_augmentation = keras.Sequential([

@@ -10,10 +10,17 @@ CATEGORIES = ['unsurfable', 'surfable']
 TEST_SIZE = 0.2
 TRAIN_SEED = 3
 VAL_SEED = 1
-CONFIG = {
+KFOLD_SPLITS = 5
+CNN_CONFIG = {
     'image_height': 40,
     'image_width': 40,
     'color_mode': 'rgb',
     'batch_size': 16,
-    'epochs': 50
+    'epochs': 300
 }
+SKLEARN_CONFIG = {
+    'image_height': 128,
+    'image_width': 128,
+    'color_mode': 'rgb'
+}
+

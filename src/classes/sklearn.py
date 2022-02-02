@@ -1,4 +1,4 @@
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import cross_validate
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
@@ -29,17 +29,17 @@ class Sklearn:
         """Prints the name of the current model."""
         print('\n' + self.model_name)
 
-    def create_svm(self):
+    def create_basic_svm(self):
         """Creates an implementation of a Scikit-learn SVM model where C=4."""
         self.model = SVC(C=4)
         self.model_name = 'basic_svm'
 
-    def create_rf(self):
-        """Creates a default Scikit-learn Random Forest model."""
+    def create_basic_rf(self):
+        """Creates an implementation of a Scikit-learn Random Forest model."""
         self.model = RandomForestClassifier()
         self.model_name = 'basic_rf'
 
-    def create_knn(self):
+    def create_basic_knn(self):
         """Creates an implementation of a Scikit-learn KNN model which uses 1 neighbour."""
         self.model = KNeighborsClassifier(n_neighbors=1)
         self.model_name = 'basic_knn'
@@ -134,3 +134,15 @@ class Sklearn:
             print('Max {}: {}% '.format(scoring_type, round(np.max(cv_result) * 100, 2)))
             print('Min {}: {}% '.format(scoring_type, round(np.min(cv_result) * 100, 2)))
             print('Average {}: {}% '.format(scoring_type, round(np.average(cv_result) * 100, 2)))
+
+    def classification_report(self, X_test, y_test):
+        """Prints information about the model's performance at predicting items in a dataset.
+
+        Args:
+            X_test (list[list]): The images in the dataset, where each image is represented as a pixel array.
+            y_test (list[int]): The labels of the images in the dataset.
+
+        """
+        y_predicted = self.model.predict(X_test)
+        print("Classification report: ")
+        print(classification_report(y_test, y_predicted))
