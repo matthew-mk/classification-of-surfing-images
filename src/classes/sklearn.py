@@ -27,22 +27,37 @@ class Sklearn:
 
     def print_model_name(self):
         """Prints the name of the current model."""
-        print('\n' + self.model_name)
+        print("\n" + self.model_name)
 
-    def create_basic_svm(self):
+    def create_svm_1(self):
         """Creates an implementation of a Scikit-learn SVM model where C=4."""
         self.model = SVC(C=4)
         self.model_name = 'basic_svm'
 
-    def create_basic_rf(self):
+    def create_rf_1(self):
         """Creates an implementation of a Scikit-learn Random Forest model."""
         self.model = RandomForestClassifier()
         self.model_name = 'basic_rf'
 
-    def create_basic_knn(self):
+    def create_knn_1(self):
         """Creates an implementation of a Scikit-learn KNN model which uses 1 neighbour."""
         self.model = KNeighborsClassifier(n_neighbors=1)
         self.model_name = 'basic_knn'
+
+    def create_svm_2(self):
+        """Creates an implementation of a Scikit-learn SVM model where C=1."""
+        self.model = SVC(C=4)
+        self.model_name = 'svm_2'
+
+    def create_rf_2(self):
+        """Creates an implementation of a Scikit-learn Random Forest model."""
+        self.model = RandomForestClassifier()
+        self.model_name = 'rf_2'
+
+    def create_knn_2(self):
+        """Creates an implementation of a Scikit-learn KNN model which uses 1 neighbour."""
+        self.model = KNeighborsClassifier(n_neighbors=1)
+        self.model_name = 'knn_2'
 
     def create_custom_model(self, model, model_name):
         """Allows a custom Scikit-learn model to be passed in as a parameter.
@@ -65,18 +80,24 @@ class Sklearn:
         """
         self.model.fit(X_train, y_train)
 
-    def test_model(self, X_test, y_test):
+    def test_model(self, X_test, y_test, show_report=False):
         """Tests the model on a dataset and prints the accuracy.
 
         Args:
             X_test (list[list]): The images in the dataset, where each image is represented as a pixel array.
             y_test (list[int]): The labels of the images in the dataset.
+            show_report (bool): Optional variable, defaults to False. If set to true it will print a classification
+              report that has details about accuracy, precision, and recall.
 
         """
         acc = self.model.score(X_test, y_test)
         self.print_model_name()
         print('Accuracy: {}%'.format(round(acc * 100, 2)))
         print('Number of correct predictions: {}/{}'.format(round(len(X_test) * acc), len(X_test)))
+        if show_report:
+            y_predicted = self.model.predict(X_test)
+            print("Classification report: ")
+            print(classification_report(y_test, y_predicted))
 
     def plot_confusion_matrix(self, X_test, y_test):
         """Creates a confusion matrix showing the model's predictions versus what the correct answers were.
@@ -126,7 +147,7 @@ class Sklearn:
             n_splits (int): The number of folds the dataset will be divided into.
 
         """
-        print(f'\n{n_splits}-Fold Cross Validation: {self.model_name}')
+        print(f'{n_splits}-Fold Cross Validation: {self.model_name}')
         scoring_types = ['accuracy', 'precision', 'recall', 'f1']
         cv_results = cross_validate(self.model, X, y, cv=n_splits, scoring=scoring_types)
         for scoring_type in scoring_types:
@@ -134,15 +155,3 @@ class Sklearn:
             print('Max {}: {}% '.format(scoring_type, round(np.max(cv_result) * 100, 2)))
             print('Min {}: {}% '.format(scoring_type, round(np.min(cv_result) * 100, 2)))
             print('Average {}: {}% '.format(scoring_type, round(np.average(cv_result) * 100, 2)))
-
-    def classification_report(self, X_test, y_test):
-        """Prints information about the model's performance at predicting items in a dataset.
-
-        Args:
-            X_test (list[list]): The images in the dataset, where each image is represented as a pixel array.
-            y_test (list[int]): The labels of the images in the dataset.
-
-        """
-        y_predicted = self.model.predict(X_test)
-        print("Classification report: ")
-        print(classification_report(y_test, y_predicted))

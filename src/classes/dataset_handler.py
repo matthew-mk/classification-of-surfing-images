@@ -28,7 +28,7 @@ class DatasetHandler:
         self.X_train, self.y_train = [], []
         self.X_test, self.y_test = [], []
 
-    def create_dataset(self, dataset_names, categories):
+    def create_dataset(self, dataset_names, categories, print_info=False):
         """Loads images from one or more datasets, does some preprocessing, and merges them into one dataset.
 
         Each image is assigned a label and converted to be the size and color mode defined by this class. In addition,
@@ -39,13 +39,18 @@ class DatasetHandler:
             dataset_names (list[str]): The names of the datasets to be loaded.
             categories (list[str]): The categories (also known as classes) in the datasets. Each dataset should have
                 the same categories.
+            print_info: (bool): Optional parameter, defaults to False. If set to true, it will print information about
+                the progress being made loading the data.
 
         """
         self.X = []
         self.y = []
+        if print_info:
+            print()
         if len(dataset_names) > 0:
             for dataset_name in dataset_names:
-                print(f'\nLoading images from {dataset_name}...')
+                if print_info:
+                    print(f'Loading images from {dataset_name}...')
                 for category in categories:
                     category_path = os.path.join(f"../datasets/{dataset_name}", category)
                     category_label = categories.index(category)
@@ -59,7 +64,8 @@ class DatasetHandler:
                             img_array = img_array / 255  # normalize the data
                             self.X.append(img_array)
                             self.y.append(category_label)
-            print('Dataset created')
+            if print_info:
+                print(f'Dataset created that contains {len(self.X)} images from {len(dataset_names)} location(s)')
 
     def train_test_split(self):
         """Splits the dataset (X and y) into datasets that can be used for training and testing.
