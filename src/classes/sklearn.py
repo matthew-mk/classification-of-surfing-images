@@ -32,32 +32,17 @@ class Sklearn:
     def create_svm_1(self):
         """Creates an implementation of a Scikit-learn SVM model where C=4."""
         self.model = SVC(C=4)
-        self.model_name = 'basic_svm'
+        self.model_name = 'svm_model'
 
     def create_rf_1(self):
-        """Creates an implementation of a Scikit-learn Random Forest model."""
+        """Creates an implementation of a Scikit-learn Random Forest model with default hyper parameters."""
         self.model = RandomForestClassifier()
-        self.model_name = 'basic_rf'
+        self.model_name = 'rf_model'
 
     def create_knn_1(self):
-        """Creates an implementation of a Scikit-learn KNN model which uses 1 neighbour."""
+        """Creates an implementation of a Scikit-learn KNN model that uses 1 neighbour."""
         self.model = KNeighborsClassifier(n_neighbors=1)
-        self.model_name = 'basic_knn'
-
-    def create_svm_2(self):
-        """Creates an implementation of a Scikit-learn SVM model where C=1."""
-        self.model = SVC(C=4)
-        self.model_name = 'svm_2'
-
-    def create_rf_2(self):
-        """Creates an implementation of a Scikit-learn Random Forest model."""
-        self.model = RandomForestClassifier()
-        self.model_name = 'rf_2'
-
-    def create_knn_2(self):
-        """Creates an implementation of a Scikit-learn KNN model which uses 1 neighbour."""
-        self.model = KNeighborsClassifier(n_neighbors=1)
-        self.model_name = 'knn_2'
+        self.model_name = 'knn_model'
 
     def create_custom_model(self, model, model_name):
         """Allows a custom Scikit-learn model to be passed in as a parameter.
@@ -80,14 +65,16 @@ class Sklearn:
         """
         self.model.fit(X_train, y_train)
 
-    def test_model(self, X_test, y_test, show_report=False):
+    def test_model(self, X_test, y_test, show_report=False, return_acc=False):
         """Tests the model on a dataset and prints the accuracy.
 
         Args:
             X_test (list[list]): The images in the dataset, where each image is represented as a pixel array.
             y_test (list[int]): The labels of the images in the dataset.
-            show_report (bool): Optional variable, defaults to False. If set to true it will print a classification
-              report that has details about accuracy, precision, and recall.
+            show_report (bool): Optional variable, defaults to False. If set to true, it will print a classification
+                report that has details about accuracy, precision, and recall.
+            return_acc (bool): Optional variable, defaults to False. If set to true, it will return the accuracy that
+                the model scored on the provided dataset.
 
         """
         acc = self.model.score(X_test, y_test)
@@ -98,6 +85,8 @@ class Sklearn:
             y_predicted = self.model.predict(X_test)
             print("Classification report: ")
             print(classification_report(y_test, y_predicted))
+        if return_acc:
+            return round(acc * 100, 2)
 
     def plot_confusion_matrix(self, X_test, y_test):
         """Creates a confusion matrix showing the model's predictions versus what the correct answers were.

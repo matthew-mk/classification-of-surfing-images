@@ -1,21 +1,21 @@
 """This module trains models to classify images of surfing locations based on whether the conditions in the images are
 suitable for surfing or not (binary classification). The models can be trained using images from 1 to 5 surfing
 locations."""
-import numpy as np
 
 from classes.cnn import *
 from classes.sklearn import *
 from classes.dataset_handler import *
 
-NUM_LOCATIONS = 2
-BEST_CNN_SEEDS = [3, 0, 0, 0, 123]
-BEST_SVM_SEEDS = [3, 2, 0, 0, 8]
-BEST_RF_SEEDS  = [3, 2, 0, 0, 12]
-BEST_KNN_SEEDS = [3, 2, 0, 0, 12]
-
 CATEGORIES = ['unsurfable', 'surfable']
-TEST_SIZE = 0.2
+NUM_LOCATIONS = 5
 KFOLD_SPLITS = 5
+TEST_SIZE = 0.2
+
+CNN_SEEDS = [3,  0,  0,  0,  123]
+SVM_SEEDS = [3,  88, 3,  47, 8]
+RF_SEEDS  = [3,  72, 30, 13, 73]
+KNN_SEEDS = [3,  50, 1,  26, 73]
+
 CNN_CONFIG = {
     'image_height': 40,
     'image_width': 40,
@@ -29,34 +29,6 @@ SKLEARN_CONFIG = {
     'color_mode': 'rgb'
 }
 
-"""
-def get_models(modelType):
-    if modelType == 'cnn':
-        basic_cnn = CNN(CNN_CONFIG)
-        basic_cnn.create_cnn_1()
-        return basic_cnn
-    elif modelType == 'sklearn':
-        basic_svm = Sklearn()
-        basic_svm.create_svm_1()
-        basic_rf = Sklearn()
-        basic_rf.create_rf_1()
-        basic_knn = Sklearn()
-        basic_knn.create_knn_1()
-        return basic_svm, basic_rf, basic_knn
-    elif modelType == 'all':
-        basic_cnn = CNN(CNN_CONFIG)
-        basic_cnn.create_cnn_1()
-        basic_svm = Sklearn()
-        basic_svm.create_svm_1()
-        basic_rf = Sklearn()
-        basic_rf.create_rf_1()
-        basic_knn = Sklearn()
-        basic_knn.create_knn_1()
-        return basic_cnn, basic_svm, basic_rf, basic_knn
-    else:
-        raise ValueError("The model type must either be 'cnn', 'sklearn', or 'all'")
-"""
-
 def get_dataset_names(num_locations):
     dataset_names = []
     if 0 < num_locations <= 5:
@@ -69,7 +41,7 @@ def get_dataset_names(num_locations):
 
 def train_and_test_cnn(num_locations):
     # Get the best training seed
-    train_seed = BEST_CNN_SEEDS[num_locations - 1]
+    train_seed = CNN_SEEDS[num_locations - 1]
 
     # Setup datasets
     cnn_dataset_handler = CNNDatasetHandler(CNN_CONFIG)
@@ -95,30 +67,68 @@ def train_and_test_sklearn(num_locations):
 
     # Create the Scikit-learn models
     svm = Sklearn()
-    svm.create_svm_2()
+    svm.create_svm_1()
     rf = Sklearn()
-    rf.create_rf_2()
+    rf.create_rf_1()
     knn = Sklearn()
-    knn.create_knn_2()
+    knn.create_knn_1()
 
     # Get the best training seeds that have been found for these algorithms based on the number of locations
     # that are used
-    svm_seed = BEST_SVM_SEEDS[num_locations - 1]
-    rf_seed = BEST_RF_SEEDS[num_locations - 1]
-    knn_seed = BEST_KNN_SEEDS[num_locations - 1]
+    svm_seed = SVM_SEEDS[num_locations - 1]
+    rf_seed = RF_SEEDS[num_locations - 1]
+    knn_seed = KNN_SEEDS[num_locations - 1]
 
     # Train and test the Scikit-learn models
     X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(TEST_SIZE, svm_seed)
     svm.train_model(X_train, y_train)
     svm.test_model(X_test, y_test)
+    # svm.save_model('basic_svm_2')  # uncomment to save the SVM model
     X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(TEST_SIZE, rf_seed)
     rf.train_model(X_train, y_train)
     rf.test_model(X_test, y_test)
+    # rf.save_model('basic_rf_2')  # uncomment to save the SVM model
     X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(TEST_SIZE, knn_seed)
     knn.train_model(X_train, y_train)
     knn.test_model(X_test, y_test)
+    # knn.save_model('basic_knn_2')  # uncomment to save the KNN model
 
-def cnn_kfold(num_locations):
+def find_best_sklearn_seeds(num_locations, max_seed):
+    # Setup datasets
+    sklearn_dataset_handler = SklearnDatasetHandler(SKLEARN_CONFIG)
+    sklearn_dataset_handler.create_dataset(get_dataset_names(num_locations), CATEGORIES, print_info=True)
+
+    # Create the Scikit-learn models
+    svm = Sklearn()
+    svm.create_svm_1()
+    rf = Sklearn()
+    rf.create_rf_1()
+    knn = Sklearn()
+    knn.create_knn_1()
+
+    # Find the best seeds
+    models_and_info = [(svm, 0, 0), (rf, 0, 0), (knn, 0, 0)]
+    for seed in range(0, max_seed + 1):
+        print('\n-----------------------------------------------')
+        print(f'\nSeed {seed} results:')
+
+        # Shuffle the dataset using the current seed
+        X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(TEST_SIZE, seed)
+
+        # Train and test the models
+        for tuple_index, (model, best_seed, best_acc) in enumerate(models_and_info):
+            model.train_model(X_train, y_train)
+            acc = model.test_model(X_test, y_test, return_acc=True)
+            if acc > best_acc:
+                temp = list(models_and_info[tuple_index])
+                temp[1], temp[2] = seed, acc
+                models_and_info[tuple_index] = tuple(temp)
+
+    print(f"\nSVM: seed={models_and_info[0][1]}, accuracy={models_and_info[0][2]}%")
+    print(f"RF: seed={models_and_info[1][1]}, accuracy={models_and_info[1][2]}%")
+    print(f"KNN: seed={models_and_info[2][1]}, accuracy={models_and_info[2][2]}%")
+
+def cnn_kfold(num_locations, num_splits):
     # Set up datasets
     cnn_dataset_handler = CNNDatasetHandler(CNN_CONFIG)
     cnn_dataset_handler.create_dataset(get_dataset_names(num_locations), CATEGORIES, print_info=True)
@@ -129,9 +139,9 @@ def cnn_kfold(num_locations):
     cnn.create_cnn_1()
 
     # K-Fold Cross Validation
-    cnn.kfold_cross_validation(X, y, KFOLD_SPLITS, TEST_SIZE)
+    cnn.kfold_cross_validation(X, y, num_splits, TEST_SIZE)
 
-def sklearn_kfold(num_locations):
+def sklearn_kfold(num_locations, num_splits):
     # Set up datasets
     sklearn_dataset_handler = SklearnDatasetHandler(SKLEARN_CONFIG)
     sklearn_dataset_handler.create_dataset(get_dataset_names(num_locations), CATEGORIES, print_info=True)
@@ -146,9 +156,9 @@ def sklearn_kfold(num_locations):
     knn.create_knn_1()
 
     # K-Fold Cross Validation
-    svm.kfold_cross_validation(X, y, KFOLD_SPLITS)
-    rf.kfold_cross_validation(X, y, KFOLD_SPLITS)
-    knn.kfold_cross_validation(X, y, KFOLD_SPLITS)
+    svm.kfold_cross_validation(X, y, num_splits)
+    rf.kfold_cross_validation(X, y, num_splits)
+    knn.kfold_cross_validation(X, y, num_splits)
 
 def test_saved_basic_models():
     # Load 'basic_cnn' model
@@ -208,10 +218,11 @@ def test_saved_basic_models():
 
 def main():
     # train_and_test_cnn(NUM_LOCATIONS)
-    # train_and_test_sklearn(NUM_LOCATIONS)
-    # cnn_kfold(NUM_LOCATIONS)
-    # sklearn_kfold(NUM_LOCATIONS)
-    test_saved_basic_models()
+    train_and_test_sklearn(NUM_LOCATIONS)
+    # find_best_sklearn_seeds(NUM_LOCATIONS, 100)
+    # cnn_kfold(NUM_LOCATIONS, KFOLD_SPLITS)
+    # sklearn_kfold(NUM_LOCATIONS, KFOLD_SPLITS)
+    # test_saved_basic_models()
 
 if __name__ == '__main__':
     main()
