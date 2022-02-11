@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-class CNN:
-    """A class for creating, training, and evaluating a Keras CNN model."""
+class BaseCNN:
+    """The base class for creating, training, and evaluating a Keras CNN model."""
 
     def __init__(self, config):
-        """Initialises information about the images and variables for training.
+        """Initialises the CNN model.
 
         Args:
             config (dict): Contains information about the images, including the image height, image width, color mode,
@@ -19,64 +19,43 @@ class CNN:
                 and number of epochs.
 
         """
+        # Init information about the images
         self.image_height = config['image_height']
         self.image_width = config['image_width']
         self.image_size = (self.image_height, self.image_width)
         self.color_mode = config['color_mode']
         self.num_channels = get_channels(self.color_mode)
+
+        # Init information for training
         self.batch_size = config['batch_size']
         self.epochs = config['epochs']
         self.history = History()
-        self.model_name = 'unnamed_cnn'
-        self.model = None
-        self.optimizer = None
-        self.loss = None
-        self.metrics = None
 
-    def get_model(self):
-        """Returns the CNN model.
+        # Create the CNN model
+        self.model, self.model_name = self.create_model()
 
-        Returns:
-            model (keras.Model): The CNN model.
-
-        """
-        return self.model
+        # Compile the model
+        self.optimizer = keras.optimizers.Adam()
+        self.loss = keras.losses.BinaryCrossentropy(from_logits=True)
+        self.metrics = ['accuracy']
+        self.compile_model()
 
     def print_model_name(self):
         """Prints the name of the current model."""
         print("\n" + self.model_name)
 
-    def create_cnn_1(self):
-        """Creates an implementation of a CNN model and compiles it."""
-        self.model_name = 'basic_cnn'
-        data_augmentation = keras.Sequential([
-            layers.RandomFlip("horizontal", input_shape=(self.image_height, self.image_width, self.num_channels)),
-            layers.RandomRotation(0.1),
-            layers.RandomZoom(0.1),
-        ])
-        self.model = keras.Sequential([
-            data_augmentation,
-            layers.Input((self.image_height, self.image_width, self.num_channels)),
-            layers.Conv2D(16, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(32, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(64, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(128, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(128, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Dropout(0.2),
-            layers.Flatten(),
-            layers.Dense(128),
-            layers.Dense(64),
-            layers.Dense(1)
-        ])
-        self.optimizer = keras.optimizers.Adam()
-        self.loss = keras.losses.BinaryCrossentropy(from_logits=True)
-        self.metrics = ['accuracy']
-        self.model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
+    def create_model(self):
+        """Creates the model.
+
+        Raises:
+            NotImplementedError: Subclasses must implement this method.
+
+        """
+        raise NotImplementedError
+
+    def compile_model(self):
+        """Compiles the model."""
+        self.model.compile(optimizer=self.optimizer,loss=self.loss, metrics=self.metrics)
 
     def train_model(self, X_train, X_val, y_train, y_val, save_name=None):
         """Trains the model using training and validation data. The best model during training can optionally be saved.
@@ -157,17 +136,7 @@ class CNN:
         self.model.save('../saved_models/{}.h5'.format(model_name))
         self.model_name = model_name
 
-    def load_model(self, model_name):
-        """Loads a CNN model from the 'saved_models' folder and sets it to be the model.
-
-        Args:
-            model_name (str): The name of the model to be loaded, e.g. 'basic_cnn'.
-
-        """
-        self.model = keras.models.load_model('../saved_models/{}.h5'.format(model_name))
-        self.model_name = model_name
-
-    def model_summary(self):
+    def summary(self):
         """Prints information about the CNN model and its structure."""
         self.model.summary()
 
@@ -214,13 +183,95 @@ class CNN:
             # Test the cloned model on the test data, then print the results
             loss, acc = cloned_model.evaluate(X_test, y_test, verbose=0)
             accuracy_scores.append(acc)
-            print(f'\nFold {fold_num} results:')
-            print(f'Test loss: {loss}')
-            print(f'Test accuracy: {acc}\n')
+            print(f'\nFold {fold_num} test dataset results:')
+            print(f'Accuracy: {round(acc * 100, 2)}%')
+            print(f'Loss: {loss}')
             fold_num += 1
 
         # Print overall k-fold cross validation results
-        print(f'{n_splits}-Fold Cross Validation: {self.model_name}')
+        print(f'\n{n_splits}-Fold Cross Validation: {self.model_name}')
         print('Max accuracy: {}% '.format(round(np.max(accuracy_scores) * 100, 2)))
         print('Min accuracy: {}% '.format(round(np.min(accuracy_scores) * 100, 2)))
         print('Average accuracy: {}% '.format(round(np.average(accuracy_scores) * 100, 2)))
+
+
+class LoadedCNN(BaseCNN):
+    """A loaded Keras CNN model."""
+
+    def __init__(self, config, model_name):
+        """Initializes a loaded Keras CNN model.
+
+
+
+        """
+        # Init information about the images
+        self.image_height = config['image_height']
+        self.image_width = config['image_width']
+        self.image_size = (self.image_height, self.image_width)
+        self.color_mode = config['color_mode']
+        self.num_channels = get_channels(self.color_mode)
+
+        # Init information for training
+        self.batch_size = config['batch_size']
+        self.epochs = config['epochs']
+        self.history = History()
+
+        # Create the CNN model
+        self.model = self.create_model()
+        self.model_name = model_name
+
+    def create_model(self):
+        """Creates the CNN model.
+
+        Returns:
+            tuple containing:
+                - model (keras.Model): The CNN model.
+                - model_name (str): The name of the model.
+
+        """
+        model = keras.models.load_model('../saved_models/{}.h5'.format(self.model_name))
+        return model
+
+
+class CNN(BaseCNN):
+    """An implementation of a Keras CNN model."""
+
+    def __init__(self, config):
+        """Initializes the CNN model."""
+        super().__init__(config)
+
+    def create_model(self):
+        """Creates the CNN model.
+
+        Returns:
+            tuple containing:
+                - model (keras.Model): The CNN model.
+                - model_name (str): The name of the model.
+
+        """
+        model_name = 'cnn_model'
+        data_augmentation = keras.Sequential([
+            layers.RandomFlip("horizontal", input_shape=(self.image_height, self.image_width, self.num_channels)),
+            layers.RandomRotation(0.1),
+            layers.RandomZoom(0.1),
+        ])
+        model = keras.Sequential([
+            data_augmentation,
+            layers.Input((self.image_height, self.image_width, self.num_channels)),
+            layers.Conv2D(16, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(32, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(64, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(128, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(128, 3, padding='same'),
+            layers.MaxPooling2D(),
+            layers.Dropout(0.2),
+            layers.Flatten(),
+            layers.Dense(128),
+            layers.Dense(64),
+            layers.Dense(1)
+        ])
+        return model, model_name

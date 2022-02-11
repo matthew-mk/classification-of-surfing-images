@@ -9,51 +9,24 @@ import numpy as np
 import pickle
 
 
-class Sklearn:
-    """A class for creating, training, and evaluating a Scikit-learn model."""
+class BaseSklearn:
+    """The base class for creating, training, and evaluating a Scikit-learn model."""
     def __init__(self):
         """Initializes a Scikit-learn model."""
-        self.model = None
-        self.model_name = 'unnamed_model'
-
-    def get_model(self):
-        """Returns the Scikit-learn model.
-
-        Returns:
-            The Scikit-learn model.
-
-        """
-        return self.model
+        self.model, self.model_name = self.create_model()
 
     def print_model_name(self):
         """Prints the name of the current model."""
         print("\n" + self.model_name)
 
-    def create_svm_1(self):
-        """Creates an implementation of a Scikit-learn SVM model where C=4."""
-        self.model = SVC(C=4)
-        self.model_name = 'svm_model'
+    def create_model(self):
+        """Creates the Scikit-learn model.
 
-    def create_rf_1(self):
-        """Creates an implementation of a Scikit-learn Random Forest model with default hyper parameters."""
-        self.model = RandomForestClassifier()
-        self.model_name = 'rf_model'
-
-    def create_knn_1(self):
-        """Creates an implementation of a Scikit-learn KNN model that uses 1 neighbour."""
-        self.model = KNeighborsClassifier(n_neighbors=1)
-        self.model_name = 'knn_model'
-
-    def create_custom_model(self, model, model_name):
-        """Allows a custom Scikit-learn model to be passed in as a parameter.
-
-        Args:
-            model: The Scikit-learn model.
-            model_name (str): The name of the model.
+        Raises:
+            NotImplementedError: Subclasses must implement this method.
 
         """
-        self.model = model
-        self.model_name = model_name
+        raise NotImplementedError
 
     def train_model(self, X_train, y_train):
         """Trains the model using a training dataset.
@@ -65,26 +38,23 @@ class Sklearn:
         """
         self.model.fit(X_train, y_train)
 
-    def test_model(self, X_test, y_test, show_report=False, return_acc=False):
+    def test_model(self, X_test, y_test, return_acc=False):
         """Tests the model on a dataset and prints the accuracy.
 
         Args:
             X_test (list[list]): The images in the dataset, where each image is represented as a pixel array.
             y_test (list[int]): The labels of the images in the dataset.
-            show_report (bool): Optional variable, defaults to False. If set to true, it will print a classification
-                report that has details about accuracy, precision, and recall.
             return_acc (bool): Optional variable, defaults to False. If set to true, it will return the accuracy that
                 the model scored on the provided dataset.
 
         """
         acc = self.model.score(X_test, y_test)
+        y_predicted = self.model.predict(X_test)
         self.print_model_name()
         print('Accuracy: {}%'.format(round(acc * 100, 2)))
         print('Number of correct predictions: {}/{}'.format(round(len(X_test) * acc), len(X_test)))
-        if show_report:
-            y_predicted = self.model.predict(X_test)
-            print("Classification report: ")
-            print(classification_report(y_test, y_predicted))
+        print("Classification report: ")
+        print(classification_report(y_test, y_predicted))
         if return_acc:
             return round(acc * 100, 2)
 
@@ -114,16 +84,6 @@ class Sklearn:
         pickle.dump(self.model, open('../saved_models/{}.sav'.format(model_name), 'wb'))
         self.model_name = model_name
 
-    def load_model(self, model_name):
-        """Loads a model from the 'saved_models' folder and sets it to be the model.
-
-        Args:
-            model_name (str): The name of the model to be loaded, e.g. 'basic_svm'.
-
-        """
-        self.model = pickle.load(open('../saved_models/{}.sav'.format(model_name), 'rb'))
-        self.model_name = model_name
-
     def kfold_cross_validation(self, X, y, n_splits):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
 
@@ -136,11 +96,125 @@ class Sklearn:
             n_splits (int): The number of folds the dataset will be divided into.
 
         """
-        print(f'{n_splits}-Fold Cross Validation: {self.model_name}')
+        # Conduct K-Fold Cross Validation
         scoring_types = ['accuracy', 'precision', 'recall', 'f1']
         cv_results = cross_validate(self.model, X, y, cv=n_splits, scoring=scoring_types)
+
+        # Change the formatting of all the results to have 2 decimal places
         for scoring_type in scoring_types:
-            cv_result = cv_results['test_{}'.format(scoring_type)]
-            print('Max {}: {}% '.format(scoring_type, round(np.max(cv_result) * 100, 2)))
-            print('Min {}: {}% '.format(scoring_type, round(np.min(cv_result) * 100, 2)))
-            print('Average {}: {}% '.format(scoring_type, round(np.average(cv_result) * 100, 2)))
+            cv_result = cv_results[f'test_{scoring_type}']
+            index = 0
+            for _ in cv_result:
+                cv_result[index] = np.round(cv_result[index] * 100, 2)
+                index += 1
+
+        accuracy_results = cv_results['test_accuracy']
+        precision_results = cv_results['test_precision']
+        recall_results = cv_results['test_recall']
+        f1_results = cv_results['test_f1']
+
+        # Print results from each fold
+        print(f'\n{n_splits}-Fold Cross Validation: {self.model_name}')
+        for i in range(0, n_splits):
+            fold_accuracy = f'{accuracy_results[i]}%'
+            fold_precision = f'{precision_results[i]}%'
+            fold_recall = f'{recall_results[i]}%'
+            fold_f1 = f1_results[i]
+            print(f'Fold {i+1}: accuracy={fold_accuracy}, precision={fold_precision}, ' +
+                  f'recall={fold_recall}, f1={fold_f1}')
+
+        # Overall results
+        print("\nOverall stats: ")
+        for scoring_type in scoring_types:
+            if scoring_type == 'f1':
+                ending = ''
+            else:
+                ending = '%'
+            cv_result = cv_results[f'test_{scoring_type}']
+            print(f'{scoring_type}: maximum={np.max(cv_result)}{ending}, minimum={np.min(cv_result)}{ending}, ' +
+                  f'average={np.average(cv_result)}{ending}')
+
+
+class LoadedSklearn(BaseSklearn):
+    """A loaded Scikit-learn model."""
+    def __init__(self, model_name):
+        """Initializes the loaded Scikit-learn model.
+
+        Args:
+            model_name (str): The name of the model to be loaded.
+
+        """
+        self.model = self.create_model()
+        self.model_name = model_name
+
+    def create_model(self):
+        """Creates the Scikit-learn model.
+
+        Returns:
+            model: The Scikit-learn model.
+
+        """
+        model = pickle.load(open('../saved_models/{}.sav'.format(self.model_name), 'rb'))
+        return model
+
+
+class SVM(BaseSklearn):
+    """An implementation of a Scikit-learn Support Vector Machine model."""
+    def __init__(self):
+        """Initializes a Scikit-learn model."""
+        super().__init__()
+
+    def create_model(self):
+        """Creates the Scikit-learn model.
+
+        Returns:
+            tuple containing:
+                - model: The Scikit-learn model.
+                - model_name (str): The name of the model.
+
+        """
+        model = SVC(C=4)
+        model_name = 'svm_model'
+        return model, model_name
+
+
+class RF(BaseSklearn):
+    """An implementation of a Scikit-learn Random Forest model."""
+
+    def __init__(self):
+        """Initializes a Scikit-learn model."""
+        super().__init__()
+
+    def create_model(self):
+        """Creates the Scikit-learn model.
+
+        Returns:
+            tuple containing:
+                - model: The Scikit-learn model.
+                - model_name (str): The name of the model.
+
+        """
+        model = RandomForestClassifier()
+        model_name = 'rf_model'
+        return model, model_name
+
+
+class KNN(BaseSklearn):
+    """An implementation of a Scikit-learn K-nearest Neighbors model."""
+
+    def __init__(self):
+        """Initializes a Scikit-learn model."""
+        super().__init__()
+
+    def create_model(self):
+        """Creates the Scikit-learn model.
+
+        Returns:
+            tuple containing:
+                - model: The Scikit-learn model.
+                - model_name (str): The name of the model.
+
+        """
+        model = KNeighborsClassifier(n_neighbors=1)
+        model_name = 'knn_model'
+        return model, model_name
