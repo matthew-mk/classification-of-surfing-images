@@ -11,12 +11,13 @@ import pickle
 
 class BaseSklearn:
     """The base class for creating, training, and evaluating a Scikit-learn model."""
+
     def __init__(self):
         """Initializes a Scikit-learn model."""
         self.model, self.model_name = self.create_model()
 
     def print_model_name(self):
-        """Prints the name of the current model."""
+        """Prints the name of the model."""
         print("\n" + self.model_name)
 
     def create_model(self):
@@ -81,8 +82,11 @@ class BaseSklearn:
             model_name (str): The name the model will be saved as, e.g. 'basic_svm'.
 
         """
-        pickle.dump(self.model, open('../saved_models/{}.sav'.format(model_name), 'wb'))
-        self.model_name = model_name
+        if isinstance(model_name, str) and len(model_name) > 0 and str.isspace(model_name) is False:
+            pickle.dump(self.model, open('../saved_models/{}.sav'.format(model_name), 'wb'))
+            self.model_name = model_name
+        else:
+            print('The model could not be saved. An invalid name was used.')
 
     def kfold_cross_validation(self, X, y, n_splits):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
@@ -120,7 +124,7 @@ class BaseSklearn:
             fold_precision = f'{precision_results[i]}%'
             fold_recall = f'{recall_results[i]}%'
             fold_f1 = f1_results[i]
-            print(f'Fold {i+1}: accuracy={fold_accuracy}, precision={fold_precision}, ' +
+            print(f'Fold {i + 1}: accuracy={fold_accuracy}, precision={fold_precision}, ' +
                   f'recall={fold_recall}, f1={fold_f1}')
 
         # Overall results
@@ -158,12 +162,20 @@ class LoadedSklearn(BaseSklearn):
             model_name (str): The name of the model to be loaded, e.g. 'basic_svm'.
 
         """
-        self.model = pickle.load(open('../saved_models/{}.sav'.format(model_name), 'rb'))
-        self.model_name = model_name
+        try:
+            self.model = pickle.load(open('../saved_models/{}.sav'.format(model_name), 'rb'))
+            self.model_name = model_name
+        except TypeError as e:
+            print('Model could not be loaded')
+            print(e)
+        except OSError as e:
+            print('Model could not be loaded')
+            print(e)
 
 
 class SVM(BaseSklearn):
     """An implementation of a Scikit-learn Support Vector Machine model."""
+
     def __init__(self):
         """Initializes a Scikit-learn model."""
         super().__init__()

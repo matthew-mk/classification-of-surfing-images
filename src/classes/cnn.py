@@ -41,7 +41,7 @@ class BaseCNN:
         self.compile_model()
 
     def print_model_name(self):
-        """Prints the name of the current model."""
+        """Prints the name of the model."""
         print("\n" + self.model_name)
 
     def create_model(self):
@@ -55,7 +55,7 @@ class BaseCNN:
 
     def compile_model(self):
         """Compiles the model."""
-        self.model.compile(optimizer=self.optimizer,loss=self.loss, metrics=self.metrics)
+        self.model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
 
     def train_model(self, X_train, X_val, y_train, y_val, save_name=None):
         """Trains the model using training and validation data. The best model during training can optionally be saved.
@@ -65,13 +65,12 @@ class BaseCNN:
             X_val (np.ndarray): The validation dataset images. Each image is represented as a pixel array.
             y_train (np.ndarray): The training dataset labels.
             y_val (np.ndarray): The validation dataset labels.
-            save_name (str): Optional parameter. If included, the best model during training will be saved using this
-                name. Defaults to None.
+            save_name (str): Optional parameter, defaults to None. If included, the best model during training will be
+                saved using this name.
 
         """
-        if save_name is None:
-            callbacks = []
-        else:
+        if isinstance(save_name, str) and len(save_name) > 0 and str.isspace(save_name) is False:
+            # Settings to save the model
             model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
                 '../saved_models/{}.h5'.format(save_name),
                 monitor='val_loss',
@@ -80,7 +79,11 @@ class BaseCNN:
             )
             callbacks = [model_checkpoint_callback]
             self.model_name = save_name
+        else:
+            # Settings to NOT save the model
+            callbacks = []
 
+        # Train the model
         self.history = self.model.fit(
             X_train,
             y_train,
@@ -133,11 +136,14 @@ class BaseCNN:
             model_name (str): The name the model will be saved as, e.g. 'basic_cnn'.
 
         """
-        self.model.save('../saved_models/{}.h5'.format(model_name))
-        self.model_name = model_name
+        if isinstance(model_name, str) and len(model_name) > 0 and str.isspace(model_name) is False:
+            self.model.save('../saved_models/{}.h5'.format(model_name))
+            self.model_name = model_name
+        else:
+            print('The model could not be saved. An invalid name was used.')
 
     def summary(self):
-        """Prints information about the CNN model and its structure."""
+        """Prints information about the architecture of the model."""
         self.model.summary()
 
     def kfold_cross_validation(self, X, y, n_splits):
@@ -170,7 +176,7 @@ class BaseCNN:
             cloned_model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
 
             # Train the cloned model using the training and validation data
-            print(f'Training on fold {fold_num}')
+            print(f'\nTraining on fold {fold_num}')
             cloned_model.fit(
                 X_train,
                 y_train,
@@ -227,9 +233,15 @@ class LoadedCNN(BaseCNN):
             model_name (str): The name of the model to be loaded, e.g. 'basic_cnn'.
 
         """
-        self.model = keras.models.load_model('../saved_models/{}.h5'.format(model_name))
-        self.model_name = model_name
-
+        try:
+            self.model = keras.models.load_model('../saved_models/{}.h5'.format(model_name))
+            self.model_name = model_name
+        except TypeError as e:
+            print('Model could not be loaded')
+            print(e)
+        except OSError as e:
+            print('Model could not be loaded')
+            print(e)
 
 class CNN(BaseCNN):
     """An implementation of a Keras CNN model."""

@@ -1,6 +1,5 @@
 """This module contains utility functions."""
 
-
 def get_channels(color_mode):
     """Returns the number of channels that a color mode has.
 
@@ -58,6 +57,3 @@ def get_seed(seeds, num_locations):
         raise ValueError(f"The number of locations is too high. Maximum = {len(seeds)}")
 
     return seeds[num_locations - 1]
-
-
-
