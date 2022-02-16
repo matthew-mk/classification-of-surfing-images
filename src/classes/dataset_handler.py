@@ -205,12 +205,13 @@ class CNNDatasetHandler(BaseDatasetHandler):
             val_seed (int): A reproducible shuffle of the validation data.
 
         Returns:
-            X_train (numpy.ndarray): The images in the training dataset.
-            X_val (numpy.ndarray): The images in the validation dataset.
-            X_test (numpy.ndarray): The images in the test dataset.
-            y_train (numpy.ndarray): The labels in the training dataset.
-            y_val (numpy.ndarray): The labels in the validation dataset.
-            y_test (numpy.ndarray): The labels in the test dataset.
+            tuple containing:
+                - X_train (numpy.ndarray): The images in the training dataset.
+                - X_val (numpy.ndarray): The images in the validation dataset.
+                - X_test (numpy.ndarray): The images in the test dataset.
+                - y_train (numpy.ndarray): The labels in the training dataset.
+                - y_val (numpy.ndarray): The labels in the validation dataset.
+                - y_test (numpy.ndarray): The labels in the test dataset.
 
         """
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y,
@@ -242,10 +243,11 @@ class SklearnDatasetHandler(BaseDatasetHandler):
             seed (int): A reproducible shuffle of the dataset.
 
         Returns:
-            X_train (numpy.ndarray): The images in the training dataset.
-            X_test (numpy.ndarray): The images in the test dataset.
-            y_train (numpy.ndarray): The labels in the training dataset.
-            y_test (numpy.ndarray): The labels in the test dataset.
+            tuple containing:
+                - X_train (numpy.ndarray): The images in the training dataset.
+                - X_test (numpy.ndarray): The images in the test dataset.
+                - y_train (numpy.ndarray): The labels in the training dataset.
+                - y_test (numpy.ndarray): The labels in the test dataset.
 
         """
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=test_size,

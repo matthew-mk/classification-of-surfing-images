@@ -137,25 +137,29 @@ class BaseSklearn:
 
 class LoadedSklearn(BaseSklearn):
     """A loaded Scikit-learn model."""
-    def __init__(self, model_name):
-        """Initializes the loaded Scikit-learn model.
 
-        Args:
-            model_name (str): The name of the model to be loaded.
-
-        """
-        self.model = self.create_model()
-        self.model_name = model_name
+    def __init__(self):
+        """Initializes a Scikit-learn model."""
+        pass
 
     def create_model(self):
         """Creates the Scikit-learn model.
 
-        Returns:
-            model: The Scikit-learn model.
+        Raises:
+            NotImplementedError: The model must be loaded.
 
         """
-        model = pickle.load(open('../saved_models/{}.sav'.format(self.model_name), 'rb'))
-        return model
+        return NotImplementedError
+
+    def load_model(self, model_name):
+        """Loads a Scikit-learn model from the 'saved_models' folder.
+
+        Args:
+            model_name (str): The name of the model to be loaded, e.g. 'basic_svm'.
+
+        """
+        self.model = pickle.load(open('../saved_models/{}.sav'.format(model_name), 'rb'))
+        self.model_name = model_name
 
 
 class SVM(BaseSklearn):

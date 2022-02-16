@@ -36,6 +36,19 @@ CONFIGS = {
 
 
 def train_and_test_cnn(datasets_to_load, categories, test_size, best_seeds, configs):
+    """Trains and tests a CNN model on images from particular datasets.
+
+    Args:
+        datasets_to_load (list[str]): A list containing the names of the datasets to be loaded.
+        categories (list[str]): The categories that the images in the datasets are categorized into.
+        test_size (float): The proportion of the dataset that will be used for testing. Ranges from 0-1.
+            E.g. 0.2 means 20% of images will be used for testing.
+        best_seeds (dict): The best seeds that have been found for each of the models based on the number of locations
+            that images are being loaded from.
+        configs (dict): Configuration settings used to set up the datasets for the Scikit-learn models and CNN models.
+            Also includes training settings for CNN models.
+
+    """
     # Setup datasets
     cnn_dataset_handler = CNNDatasetHandler(configs['cnn'])
     cnn_dataset_handler.create_dataset(datasets_to_load, categories, print_info=True)
@@ -55,6 +68,19 @@ def train_and_test_cnn(datasets_to_load, categories, test_size, best_seeds, conf
     cnn.test_model(X_test, y_test)
 
 def train_and_test_sklearn(datasets_to_load, categories, test_size, best_seeds, configs):
+    """Trains and tests Scikit-learn models on images from particular datasets.
+
+    Args:
+        datasets_to_load (list[str]): A list containing the names of the datasets to be loaded.
+        categories (list[str]): The categories that the images in the datasets are categorized into.
+        test_size (float): The proportion of the dataset that will be used for testing. Ranges from 0-1.
+            E.g. 0.2 means 20% of images will be used for testing.
+        best_seeds (dict): The best seeds that have been found for each of the models based on the number of locations
+            that images are being loaded from.
+        configs (dict): Configuration settings used to set up the datasets for the Scikit-learn models and CNN models.
+            Also includes training settings for CNN models.
+
+    """
     # Setup datasets
     sklearn_dataset_handler = SklearnDatasetHandler(configs['sklearn'])
     sklearn_dataset_handler.create_dataset(datasets_to_load, categories, print_info=True)
@@ -85,6 +111,18 @@ def train_and_test_sklearn(datasets_to_load, categories, test_size, best_seeds, 
     # knn.save_model('basic_knn_2')  # uncomment to save the KNN model
 
 def find_best_sklearn_seeds(datasets_to_load, categories, test_size, configs, max_seed):
+    """Tests Scikit-learn models on a variable number of seeds and prints the best seeds that were found.
+
+    Args:
+        datasets_to_load (list[str]): A list containing the names of the datasets to be loaded.
+        categories (list[str]): The categories that the images in the datasets are categorized into.
+        test_size (float): The proportion of the dataset that will be used for testing. Ranges from 0-1.
+            E.g. 0.2 means 20% of images will be used for testing.
+        configs (dict): Configuration settings used to set up the datasets for the Scikit-learn models and CNN models.
+            Also includes training settings for CNN models.
+        max_seed (int): The number of seeds to be tested. E.g. 100 means up to 100 seeds.
+
+    """
     # Setup datasets
     sklearn_dataset_handler = SklearnDatasetHandler(configs['sklearn'])
     sklearn_dataset_handler.create_dataset(datasets_to_load, categories, print_info=True)
@@ -116,7 +154,20 @@ def find_best_sklearn_seeds(datasets_to_load, categories, test_size, configs, ma
     print(f"RF: seed={models_and_info[1][1]}, accuracy={models_and_info[1][2]}%")
     print(f"KNN: seed={models_and_info[2][1]}, accuracy={models_and_info[2][2]}%")
 
-def cnn_kfold(datasets_to_load, categories, test_size, num_splits, configs):
+def cnn_kfold(datasets_to_load, categories, num_splits, configs):
+    """Performs k-fold cross validation on a CNN model.
+
+    80% of the images are used for training and 20% for testing.
+
+    Args:
+        datasets_to_load (list[str]): A list containing the names of the datasets to be loaded.
+        categories (list[str]): The categories that the images in the datasets are categorized into.
+        num_splits (int): The number of different ways in which the dataset will be split for k-fold cross
+            validation.
+        configs (dict): Configuration settings used to set up the datasets for the Scikit-learn models and CNN models.
+            Also includes training settings for CNN models.
+
+    """
     # Set up datasets
     cnn_dataset_handler = CNNDatasetHandler(configs['cnn'])
     cnn_dataset_handler.create_dataset(datasets_to_load, categories, print_info=True)
@@ -126,9 +177,22 @@ def cnn_kfold(datasets_to_load, categories, test_size, num_splits, configs):
     cnn = CNN(configs['cnn'])
 
     # K-Fold Cross Validation
-    cnn.kfold_cross_validation(X, y, num_splits, test_size)
+    cnn.kfold_cross_validation(X, y, num_splits)
 
 def sklearn_kfold(datasets_to_load, categories, num_splits, configs):
+    """Performs k-fold cross validation on SVM, RF, and KNN models.
+
+    80% of the images are used for training and 20% for testing.
+
+    Args:
+        datasets_to_load (list[str]): A list containing the names of the datasets to be loaded.
+        categories (list[str]): The categories that the images in the datasets are categorized into.
+        num_splits (int): The number of different ways in which the dataset will be split for k-fold cross
+            validation.
+        configs (dict): Configuration settings used to set up the datasets for the Scikit-learn models and CNN models.
+            Also includes training settings for CNN models.
+
+    """
     # Set up datasets
     sklearn_dataset_handler = SklearnDatasetHandler(configs['sklearn'])
     sklearn_dataset_handler.create_dataset(datasets_to_load, categories, print_info=True)
@@ -145,11 +209,26 @@ def sklearn_kfold(datasets_to_load, categories, num_splits, configs):
     knn.kfold_cross_validation(X, y, num_splits)
 
 def test_saved_basic_models(configs):
-    # Load the 'basic' models
-    loaded_cnn = LoadedCNN(configs['cnn'], 'basic_cnn')
-    loaded_svm = LoadedSklearn('basic_svm')
-    loaded_rf = LoadedSklearn('basic_rf')
-    loaded_knn = LoadedSklearn('basic_knn')
+    """Loads the models that were trained on images from a single surfing location and tests their performance on images
+    from other locations.
+
+    Args:
+        configs (dict): Configuration settings used to set up the datasets for the Scikit-learn models and CNN models.
+            Also includes training settings for CNN models.
+
+    """
+    # Load the models
+    loaded_cnn = LoadedCNN(configs['cnn'])
+    loaded_cnn.load_model('basic_cnn')
+
+    loaded_svm = LoadedSklearn()
+    loaded_svm.load_model('basic_svm')
+
+    loaded_rf = LoadedSklearn()
+    loaded_rf.load_model('basic_rf')
+
+    loaded_knn = LoadedSklearn()
+    loaded_knn.load_model('basic_knn')
 
     # Setup datasets for the loaded CNN model
     cnn_dataset_handler = CNNDatasetHandler(configs['cnn'])
@@ -195,10 +274,10 @@ def test_saved_basic_models(configs):
 
 def main():
     # train_and_test_cnn(DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, BEST_SEEDS, CONFIGS)
-    # train_and_test_sklearn(DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, BEST_SEEDS, CONFIGS)
+    train_and_test_sklearn(DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, BEST_SEEDS, CONFIGS)
     # find_best_sklearn_seeds(DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS, NUM_SEEDS_TO_TEST)
-    # cnn_kfold(DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, KFOLD_SPLITS, CONFIGS)
-    sklearn_kfold(DATASETS_TO_LOAD, CATEGORIES, KFOLD_SPLITS, CONFIGS)
+    # cnn_kfold(DATASETS_TO_LOAD, CATEGORIES, KFOLD_SPLITS, CONFIGS)
+    # sklearn_kfold(DATASETS_TO_LOAD, CATEGORIES, KFOLD_SPLITS, CONFIGS)
     # test_saved_basic_models(CONFIGS)
 
 if __name__ == '__main__':

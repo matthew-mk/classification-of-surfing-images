@@ -140,7 +140,7 @@ class BaseCNN:
         """Prints information about the CNN model and its structure."""
         self.model.summary()
 
-    def kfold_cross_validation(self, X, y, n_splits, test_size):
+    def kfold_cross_validation(self, X, y, n_splits):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
 
         Note: This function will only return legitimate results if the model has not been trained on the dataset that is
@@ -150,21 +150,20 @@ class BaseCNN:
             X (np.ndarray): The images in the dataset, where each image is represented as a list of pixel values.
             y (np.ndarray): The labels of the images.
             n_splits (int): The number of folds the dataset will be divided into.
-            test_size (float): The proportion of the dataset that will be used for testing. Ranges from 0-1.
 
         """
         fold_num = 1
         X = np.array(X)
         y = np.array(y)
         accuracy_scores = []
-        skf = StratifiedShuffleSplit(n_splits=n_splits, test_size=test_size)
+        skf = StratifiedShuffleSplit(n_splits=n_splits, test_size=0.2)
 
         for train_index, test_index in skf.split(X, y):
             # Set up training, validation, and test datasets for the current fold
             X = X.reshape(len(X), self.image_height, self.image_width, self.num_channels)
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=test_size)
+            X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2)
 
             # Create a clone of the current model and compile it
             cloned_model = keras.models.clone_model(self.model)
@@ -198,12 +197,8 @@ class BaseCNN:
 class LoadedCNN(BaseCNN):
     """A loaded Keras CNN model."""
 
-    def __init__(self, config, model_name):
-        """Initializes a loaded Keras CNN model.
-
-
-
-        """
+    def __init__(self, config):
+        """Initializes the information needed to train the CNN model."""
         # Init information about the images
         self.image_height = config['image_height']
         self.image_width = config['image_width']
@@ -216,21 +211,24 @@ class LoadedCNN(BaseCNN):
         self.epochs = config['epochs']
         self.history = History()
 
-        # Create the CNN model
-        self.model = self.create_model()
-        self.model_name = model_name
-
     def create_model(self):
         """Creates the CNN model.
 
-        Returns:
-            tuple containing:
-                - model (keras.Model): The CNN model.
-                - model_name (str): The name of the model.
+        Raises:
+            NotImplementedError: The model must be loaded.
 
         """
-        model = keras.models.load_model('../saved_models/{}.h5'.format(self.model_name))
-        return model
+        return NotImplementedError
+
+    def load_model(self, model_name):
+        """Loads a CNN model from the 'saved_models' folder.
+
+        Args:
+            model_name (str): The name of the model to be loaded, e.g. 'basic_cnn'.
+
+        """
+        self.model = keras.models.load_model('../saved_models/{}.h5'.format(model_name))
+        self.model_name = model_name
 
 
 class CNN(BaseCNN):
