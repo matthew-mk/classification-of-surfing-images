@@ -31,14 +31,13 @@ class BaseCNN:
         self.epochs = config['epochs']
         self.history = History()
 
+        # Init compilation settings
+        self.optimizer = None
+        self.loss = None
+        self.metrics = ['accuracy']
+
         # Create the CNN model
         self.model, self.model_name = self.create_model()
-
-        # Compile the model
-        self.optimizer = keras.optimizers.Adam()
-        self.loss = keras.losses.BinaryCrossentropy(from_logits=True)
-        self.metrics = ['accuracy']
-        self.compile_model()
 
     def print_model_name(self):
         """Prints the name of the model."""
@@ -53,8 +52,16 @@ class BaseCNN:
         """
         raise NotImplementedError
 
-    def compile_model(self):
-        """Compiles the model."""
+    def compile_model(self, optimizer, loss):
+        """Compiles the model using a particular optimizer and loss function.
+
+        Args:
+            loss (keras.losses): The loss function.
+            optimizer (keras.optimizers): The optimizer, e.g. keras.optimizers.Adam().
+
+        """
+        self.optimizer = optimizer
+        self.loss = loss
         self.model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
 
     def train_model(self, X_train, X_val, y_train, y_val, save_name=None):
@@ -84,36 +91,45 @@ class BaseCNN:
             callbacks = []
 
         # Train the model
-        self.history = self.model.fit(
-            X_train,
-            y_train,
-            validation_data=(X_val, y_val),
-            epochs=self.epochs,
-            batch_size=self.batch_size,
-            callbacks=callbacks
-        )
+        try:
+            self.history = self.model.fit(
+                X_train,
+                y_train,
+                validation_data=(X_val, y_val),
+                epochs=self.epochs,
+                batch_size=self.batch_size,
+                callbacks=callbacks
+            )
+        except RuntimeError:
+            print('The model must be compiled before training/testing. Use compile_model(optimizer, loss)')
 
     def plot_training_accuracy(self):
         """Plots a graph showing the CNN model's training and validation accuracy over each epoch."""
-        epochs_range = range(1, self.epochs + 1)
-        plt.plot(epochs_range, self.history.history['accuracy'], label='Training accuracy')
-        plt.plot(epochs_range, self.history.history['val_accuracy'], label='Validation accuracy')
-        plt.title('Training and Validation Accuracy')
-        plt.xlabel('Epochs')
-        plt.ylabel('Accuracy')
-        plt.legend()
-        plt.show()
+        try:
+            epochs_range = range(1, self.epochs + 1)
+            plt.plot(epochs_range, self.history.history['accuracy'], label='Training accuracy')
+            plt.plot(epochs_range, self.history.history['val_accuracy'], label='Validation accuracy')
+            plt.title('Training and Validation Accuracy')
+            plt.xlabel('Epochs')
+            plt.ylabel('Accuracy')
+            plt.legend()
+            plt.show()
+        except KeyError:
+            raise
 
     def plot_training_loss(self):
         """Plots a graph showing the CNN model's training and validation loss over each epoch."""
-        epochs_range = range(1, self.epochs + 1)
-        plt.plot(epochs_range, self.history.history['loss'], label='Training loss')
-        plt.plot(epochs_range, self.history.history['val_loss'], label='Validation loss')
-        plt.title('Training and Validation Loss')
-        plt.xlabel('Epochs')
-        plt.ylabel('Loss')
-        plt.legend()
-        plt.show()
+        try:
+            epochs_range = range(1, self.epochs + 1)
+            plt.plot(epochs_range, self.history.history['loss'], label='Training loss')
+            plt.plot(epochs_range, self.history.history['val_loss'], label='Validation loss')
+            plt.title('Training and Validation Loss')
+            plt.xlabel('Epochs')
+            plt.ylabel('Loss')
+            plt.legend()
+            plt.show()
+        except KeyError:
+            raise
 
     def test_model(self, X_test, y_test):
         """Tests the model on a dataset and prints the accuracy, number of correct predictions, and loss.
@@ -123,7 +139,11 @@ class BaseCNN:
             y_test (np.ndarray): The labels in the dataset.
 
         """
-        loss, acc = self.model.evaluate(X_test, y_test, verbose=0)
+        try:
+            loss, acc = self.model.evaluate(X_test, y_test, verbose=0)
+        except RuntimeError:
+            print('The model must be compiled before training/testing. Use compile_model(optimizer, loss)')
+
         self.print_model_name()
         print('Accuracy: {}%'.format((round(acc * 100, 2))))
         print('Number of correct predictions: {}/{}'.format(round(len(X_test) * acc), len(X_test)))

@@ -25,7 +25,7 @@ CONFIGS = {
         'image_width': 40,
         'color_mode': 'rgb',
         'batch_size': 16,
-        'epochs': 100
+        'epochs': 10
     },
     'sklearn': {
         'image_height': 128,
@@ -249,6 +249,7 @@ def test_saved_basic_models(configs):
 def main():
     # Create the models
     cnn = CNN(CONFIGS['cnn'])
+    cnn.compile_model(keras.optimizers.Adam(), keras.losses.BinaryCrossentropy(from_logits=True))
     svm = SVM()
     rf = RF()
     knn = KNN()
@@ -257,7 +258,7 @@ def main():
     models_and_seeds = [(cnn, BEST_SEEDS['cnn']), (svm, BEST_SEEDS['svm']), (rf, BEST_SEEDS['rf']),
                         (knn, BEST_SEEDS['knn'])]
 
-    # train_and_test_model(cnn, BEST_SEEDS['cnn'], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
+    train_and_test_model(cnn, BEST_SEEDS['cnn'], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
     # train_and_test_models(models_and_seeds, DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
     # k_fold_cross_validation(models, DATASETS_TO_LOAD, CATEGORIES, K_FOLD_SPLITS, CONFIGS)
     # find_best_sklearn_seeds(models, DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS, NUM_SEEDS_TO_TEST)
