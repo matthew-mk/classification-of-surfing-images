@@ -1,7 +1,7 @@
 """This module contains a base class for handling datasets, along with multiple subclasses that handle datasets for
 models that are created using specific libraries."""
 
-from utils import *
+from utils.helper_utils import *
 from tensorflow import keras
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -26,6 +26,27 @@ class BaseDatasetHandler:
         self.X, self.y = [], []
         self.X_train, self.y_train = [], []
         self.X_test, self.y_test = [], []
+
+    @staticmethod
+    def get_dataset_names(dataset_type, num_locations):
+        """Creates a list of dataset names based on the information that is passed in.
+
+        Args:
+            dataset_type (str): The type of dataset, e.g. 'binary' or 'rating'.
+            num_locations (int): The number of locations (or directories) to load images from.
+
+        Returns:
+            dataset_names (list[str]): The list of dataset names.
+
+        """
+        dataset_names = []
+        if num_locations > 0:
+            for i in range(1, num_locations + 1):
+                dataset_names.append(f'{dataset_type}_{i}')
+        else:
+            raise ValueError("The number of locations must be greater than 0.")
+
+        return dataset_names
 
     def create_dataset(self, datasets_to_load, categories, print_info=False):
         """Loads images from one or more datasets, does some preprocessing, and merges them into one dataset.

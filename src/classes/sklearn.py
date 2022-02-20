@@ -1,3 +1,6 @@
+"""This module defines a base class that contains shared functionality for Scikit-learn models. There are also
+subclasses that inherit from the base class, including particular implementations of SVM, RF, and KNN models. """
+
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import cross_validate
 from sklearn.svm import SVC

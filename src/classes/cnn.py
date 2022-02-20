@@ -1,4 +1,7 @@
-from utils import *
+"""This module defines a base class that contains shared functionality for CNN models. There are also subclasses that
+inherit from the base class, which are particular implementations of a CNN. """
+
+from utils.helper_utils import *
 from tensorflow import keras
 from keras import layers
 from keras.callbacks import History

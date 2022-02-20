@@ -1,39 +1,8 @@
-"""This module trains models to classify images of surfing locations based on whether the conditions in the images are
-suitable for surfing or not (binary classification). The models can be trained using images from 1 to 5 surfing
-locations."""
+"""This module contains functions for training, testing, and evaluating models."""
 
 from classes.cnn import *
 from classes.sklearn import *
 from classes.dataset_handler import *
-
-DATASET_TYPE = 'binary'
-CATEGORIES = ['unsurfable', 'surfable']
-NUM_LOCATIONS = 5
-TEST_SIZE = 0.2
-K_FOLD_SPLITS = 3
-NUM_SEEDS_TO_TEST = 10
-DATASETS_TO_LOAD = get_dataset_names(DATASET_TYPE, NUM_LOCATIONS)
-BEST_SEEDS = {
-    'cnn': get_seed([3, 0, 0, 0, 123], NUM_LOCATIONS),
-    'svm': get_seed([3, 88, 3, 47, 8], NUM_LOCATIONS),
-    'rf': get_seed([3, 72, 30, 13, 73], NUM_LOCATIONS),
-    'knn': get_seed([3, 50, 1, 26, 73], NUM_LOCATIONS)
-}
-CONFIGS = {
-    'cnn': {
-        'image_height': 40,
-        'image_width': 40,
-        'color_mode': 'rgb',
-        'batch_size': 16,
-        'epochs': 10
-    },
-    'sklearn': {
-        'image_height': 128,
-        'image_width': 128,
-        'color_mode': 'rgb'
-    }
-}
-
 
 def train_and_test_model(model, seed, datasets_to_load, categories, test_size, configs, save_name=None):
     """Trains and tests a model using images from the specified datasets.
@@ -182,25 +151,33 @@ def find_best_sklearn_seeds(models, datasets_to_load, categories, test_size, con
         print(f"seed={best_seed}, accuracy={best_acc}%")
 
 
-def test_saved_basic_models(configs):
-    """Loads the models that were trained on images from a single surfing location and tests their performance on images
-    from other locations.
+def test_saved_basic_models():
+    """Loads the models that were trained on images from a single surfing location (Bantham beach) and tests their
+    performance on images from other locations."""
 
-    Args:
-        configs (dict): Configuration settings used to set up the datasets for the Scikit-learn models and CNN models.
-            Also includes training settings for CNN models.
+    # Configuration settings for the models
+    configs = {
+        'cnn': {
+            'image_height': 40,
+            'image_width': 40,
+            'color_mode': 'rgb',
+            'batch_size': 16,
+            'epochs': 10
+        },
+        'sklearn': {
+            'image_height': 128,
+            'image_width': 128,
+            'color_mode': 'rgb'
+        }
+    }
 
-    """
     # Load the models
     loaded_cnn = LoadedCNN(configs['cnn'])
     loaded_cnn.load_model('basic_cnn')
-
     loaded_svm = LoadedSklearn()
     loaded_svm.load_model('basic_svm')
-
     loaded_rf = LoadedSklearn()
     loaded_rf.load_model('basic_rf')
-
     loaded_knn = LoadedSklearn()
     loaded_knn.load_model('basic_knn')
 
@@ -245,24 +222,3 @@ def test_saved_basic_models(configs):
         loaded_svm.test_model(X_test, y_test)
         loaded_rf.test_model(X_test, y_test)
         loaded_knn.test_model(X_test, y_test)
-
-def main():
-    # Create the models
-    cnn = CNN(CONFIGS['cnn'])
-    cnn.compile_model(keras.optimizers.Adam(), keras.losses.BinaryCrossentropy(from_logits=True))
-    svm = SVM()
-    rf = RF()
-    knn = KNN()
-
-    models = [cnn]
-    models_and_seeds = [(cnn, BEST_SEEDS['cnn']), (svm, BEST_SEEDS['svm']), (rf, BEST_SEEDS['rf']),
-                        (knn, BEST_SEEDS['knn'])]
-
-    train_and_test_model(cnn, BEST_SEEDS['cnn'], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
-    # train_and_test_models(models_and_seeds, DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
-    # k_fold_cross_validation(models, DATASETS_TO_LOAD, CATEGORIES, K_FOLD_SPLITS, CONFIGS)
-    # find_best_sklearn_seeds(models, DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS, NUM_SEEDS_TO_TEST)
-    # test_saved_basic_models(CONFIGS)
-
-if __name__ == '__main__':
-    main()
