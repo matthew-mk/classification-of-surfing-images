@@ -1,16 +1,17 @@
-"""This module defines a base class that contains shared functionality for CNN models. There are also subclasses that
-inherit from the base class, which are particular implementations of a CNN. """
+"""This module defines an abstract base class that contains common functionality for CNN models. There are also
+subclasses that inherit from the base class, which are particular implementations of a CNN. """
 
 from utils.helper_utils import *
 from tensorflow import keras
 from keras import layers
 from keras.callbacks import History
 from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
+from abc import ABC, abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-class BaseCNN:
+class AbstractCNN(ABC):
     """The base class for creating, training, and evaluating a Keras CNN model."""
 
     def __init__(self, config):
@@ -46,6 +47,7 @@ class BaseCNN:
         """Prints the name of the model."""
         print("\n" + self.model_name)
 
+    @abstractmethod
     def create_model(self):
         """Creates the model.
 
@@ -53,7 +55,7 @@ class BaseCNN:
             NotImplementedError: Subclasses must implement this method.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError('Subclasses must implement this method.')
 
     def compile_model(self, optimizer, loss):
         """Compiles the model using a particular optimizer and loss function.
@@ -223,7 +225,7 @@ class BaseCNN:
         print('Average accuracy: {}% '.format(round(np.average(accuracy_scores) * 100, 2)))
 
 
-class LoadedCNN(BaseCNN):
+class LoadedCNN(AbstractCNN):
     """A loaded Keras CNN model."""
 
     def __init__(self, config):
@@ -247,7 +249,7 @@ class LoadedCNN(BaseCNN):
             NotImplementedError: The model must be loaded.
 
         """
-        return NotImplementedError
+        raise NotImplementedError('The model must be loaded.')
 
     def load_model(self, model_name):
         """Loads a CNN model from the 'saved_models' folder.
@@ -266,7 +268,7 @@ class LoadedCNN(BaseCNN):
             print('Model could not be loaded')
             print(e)
 
-class CNN(BaseCNN):
+class CNN(AbstractCNN):
     """An implementation of a Keras CNN model."""
 
     def __init__(self, config):

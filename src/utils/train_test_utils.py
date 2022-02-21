@@ -21,7 +21,7 @@ def train_and_test_model(model, seed, datasets_to_load, categories, test_size, c
             name.
 
     """
-    if issubclass(type(model), BaseCNN):
+    if issubclass(type(model), AbstractCNN):
         # The model is a CNN model
         # Setup datasets
         cnn_dataset_handler = CNNDatasetHandler(configs['cnn'])
@@ -35,7 +35,7 @@ def train_and_test_model(model, seed, datasets_to_load, categories, test_size, c
         model.plot_training_accuracy()
         # Test the CNN model that was trained
         model.test_model(X_test, y_test)
-    elif issubclass(type(model), BaseSklearn):
+    elif issubclass(type(model), AbstractSklearn):
         # The model is a Scikit-learn model
         # Setup datasets
         sklearn_dataset_handler = SklearnDatasetHandler(configs['sklearn'])
@@ -83,7 +83,7 @@ def k_fold_cross_validation(models, datasets_to_load, categories, num_splits, co
 
     """
     for model in models:
-        if issubclass(type(model), BaseCNN):
+        if issubclass(type(model), AbstractCNN):
             # The model is a CNN model
             # Set up datasets
             cnn_dataset_handler = CNNDatasetHandler(configs['cnn'])
@@ -91,7 +91,7 @@ def k_fold_cross_validation(models, datasets_to_load, categories, num_splits, co
             X, y = cnn_dataset_handler.get_X_and_y()
             # K-Fold Cross Validation
             model.kfold_cross_validation(X, y, num_splits)
-        elif issubclass(type(model), BaseSklearn):
+        elif issubclass(type(model), AbstractSklearn):
             # The model is a Scikit-learn model
             # Set up datasets
             sklearn_dataset_handler = SklearnDatasetHandler(configs['sklearn'])

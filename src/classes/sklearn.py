@@ -1,4 +1,4 @@
-"""This module defines a base class that contains shared functionality for Scikit-learn models. There are also
+"""This module defines an abstract base class that contains common functionality for Scikit-learn models. There are also
 subclasses that inherit from the base class, including particular implementations of SVM, RF, and KNN models. """
 
 from sklearn.metrics import confusion_matrix, classification_report
@@ -6,13 +6,14 @@ from sklearn.model_selection import cross_validate
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from abc import ABC, abstractmethod
 import matplotlib.pyplot as plt
 import seaborn as sn
 import numpy as np
 import pickle
 
 
-class BaseSklearn:
+class AbstractSklearn(ABC):
     """The base class for creating, training, and evaluating a Scikit-learn model."""
 
     def __init__(self):
@@ -23,6 +24,7 @@ class BaseSklearn:
         """Prints the name of the model."""
         print("\n" + self.model_name)
 
+    @abstractmethod
     def create_model(self):
         """Creates the Scikit-learn model.
 
@@ -30,7 +32,7 @@ class BaseSklearn:
             NotImplementedError: Subclasses must implement this method.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError('Subclasses must implement this method.')
 
     def train_model(self, X_train, y_train):
         """Trains the model using a training dataset.
@@ -142,7 +144,7 @@ class BaseSklearn:
                   f'average={np.average(cv_result)}{ending}')
 
 
-class LoadedSklearn(BaseSklearn):
+class LoadedSklearn(AbstractSklearn):
     """A loaded Scikit-learn model."""
 
     def __init__(self):
@@ -156,7 +158,7 @@ class LoadedSklearn(BaseSklearn):
             NotImplementedError: The model must be loaded.
 
         """
-        return NotImplementedError
+        raise NotImplementedError('The model must be loaded.')
 
     def load_model(self, model_name):
         """Loads a Scikit-learn model from the 'saved_models' folder.
@@ -176,7 +178,7 @@ class LoadedSklearn(BaseSklearn):
             print(e)
 
 
-class SVM(BaseSklearn):
+class SVM(AbstractSklearn):
     """An implementation of a Scikit-learn Support Vector Machine model."""
 
     def __init__(self):
@@ -197,7 +199,7 @@ class SVM(BaseSklearn):
         return model, model_name
 
 
-class RF(BaseSklearn):
+class RF(AbstractSklearn):
     """An implementation of a Scikit-learn Random Forest model."""
 
     def __init__(self):
@@ -218,7 +220,7 @@ class RF(BaseSklearn):
         return model, model_name
 
 
-class KNN(BaseSklearn):
+class KNN(AbstractSklearn):
     """An implementation of a Scikit-learn K-nearest Neighbors model."""
 
     def __init__(self):

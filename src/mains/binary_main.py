@@ -10,7 +10,7 @@ NUM_LOCATIONS = 1
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 3
 NUM_SEEDS_TO_TEST = 10
-DATASETS_TO_LOAD = BaseDatasetHandler.get_dataset_names(DATASET_TYPE, NUM_LOCATIONS)
+DATASETS_TO_LOAD = AbstractDatasetHandler.get_dataset_names(DATASET_TYPE, NUM_LOCATIONS)
 BEST_SEEDS = {
     'cnn': get_seed([3, 0, 0, 0, 123], NUM_LOCATIONS),
     'svm': get_seed([3, 88, 3, 47, 8], NUM_LOCATIONS),
@@ -44,7 +44,8 @@ def main():
     # train_and_test_model(svm, BEST_SEEDS['svm'], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
 
     # Train multiple models
-    models_and_seeds = [(svm, BEST_SEEDS['svm']), (rf, BEST_SEEDS['rf']), (knn, BEST_SEEDS['knn'])]
+    models_and_seeds = [(cnn, BEST_SEEDS['cnn']), (svm, BEST_SEEDS['svm']), (rf, BEST_SEEDS['rf']),
+                        (knn, BEST_SEEDS['knn'])]
     train_and_test_models(models_and_seeds, DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
 
     # Apply k-fold cross validation to one or more models

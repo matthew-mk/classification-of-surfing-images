@@ -1,14 +1,15 @@
-"""This module contains a base class for handling datasets, along with multiple subclasses that handle datasets for
-models that are created using specific libraries."""
+"""This module defines an abstract base class for handling datasets. There are also multiple subclasses that handle
+datasets for models that are created using specific libraries. """
 
 from utils.helper_utils import *
 from tensorflow import keras
 from sklearn.model_selection import train_test_split
+from abc import ABC, abstractmethod
 import numpy as np
 import os
 
 
-class BaseDatasetHandler:
+class AbstractDatasetHandler(ABC):
     """The base class for handling datasets."""
     def __init__(self, config):
         """Initialises the constraints that will be applied to the images in the datasets that are used.
@@ -89,6 +90,7 @@ class BaseDatasetHandler:
                 print(f'Dataset created that contains {len(self.X)} images from {len(datasets_to_load)} '
                       f'{location_text}')
 
+    @abstractmethod
     def train_test_split(self):
         """Splits the dataset (X and y) into datasets that can be used for training and testing.
 
@@ -96,7 +98,7 @@ class BaseDatasetHandler:
             NotImplementedError: Subclasses must implement this method.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError('Subclasses must implement this method.')
 
     def get_X(self):
         """Returns the list of images, where each image is represented as a pixel array.
@@ -164,7 +166,7 @@ class BaseDatasetHandler:
         return self.color_mode
 
 
-class CNNDatasetHandler(BaseDatasetHandler):
+class CNNDatasetHandler(AbstractDatasetHandler):
     """Sets up datasets for Keras CNN models."""
     def __init__(self, config):
         """Initialises the constraints that will be applied to the images in the datasets that are used.
@@ -246,7 +248,7 @@ class CNNDatasetHandler(BaseDatasetHandler):
         return self.X_train, self.X_val, self.X_test, self.y_train, self.y_val, self.y_test
 
 
-class SklearnDatasetHandler(BaseDatasetHandler):
+class SklearnDatasetHandler(AbstractDatasetHandler):
     """Sets up datasets for Scikit-learn models."""
     def __init__(self, config):
         """Initialises the constraints that will be applied to the images in the datasets that are used.
