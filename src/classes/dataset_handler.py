@@ -85,7 +85,9 @@ class BaseDatasetHandler:
                             self.X.append(img_array)
                             self.y.append(category_label)
             if print_info:
-                print(f'Dataset created that contains {len(self.X)} images from {len(datasets_to_load)} location(s)')
+                location_text = 'location' if len(datasets_to_load) == 1 else 'locations'
+                print(f'Dataset created that contains {len(self.X)} images from {len(datasets_to_load)} '
+                      f'{location_text}')
 
     def train_test_split(self):
         """Splits the dataset (X and y) into datasets that can be used for training and testing.

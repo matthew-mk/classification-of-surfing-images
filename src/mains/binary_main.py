@@ -33,23 +33,24 @@ CONFIGS = {
 }
 
 def main():
-    # Create the models
+    # Create instances of the models
     cnn = CNN(CONFIGS['cnn'])
     cnn.compile_model(keras.optimizers.Adam(), keras.losses.BinaryCrossentropy(from_logits=True))
     svm = SVM()
     rf = RF()
     knn = KNN()
 
+    # Train a single model
     # train_and_test_model(svm, BEST_SEEDS['svm'], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
 
-    models_and_seeds = [(cnn, BEST_SEEDS['cnn']), (svm, BEST_SEEDS['svm']), (rf, BEST_SEEDS['rf']),
-                        (knn, BEST_SEEDS['knn'])]
+    # Train multiple models
+    models_and_seeds = [(svm, BEST_SEEDS['svm']), (rf, BEST_SEEDS['rf']), (knn, BEST_SEEDS['knn'])]
     train_and_test_models(models_and_seeds, DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
 
+    # Apply k-fold cross validation to one or more models
     # k_fold_cross_validation([cnn, svm, rf, knn], DATASETS_TO_LOAD, CATEGORIES, K_FOLD_SPLITS, CONFIGS)
 
-    # find_best_sklearn_seeds([svm, rf, knn], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS, NUM_SEEDS_TO_TEST)
-
+    # Test the models that have been saved that were trained on images from a single surfing location (Bantham beach)
     # test_saved_basic_models()
 
 if __name__ == '__main__':
