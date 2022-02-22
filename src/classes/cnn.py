@@ -2,10 +2,12 @@
 subclasses that inherit from the base class, which are particular implementations of a CNN. """
 
 from utils.helper_utils import *
+import tensorflow as tf
 from tensorflow import keras
 from keras import layers
 from keras.callbacks import History
 from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
+from sklearn.metrics import classification_report
 from abc import ABC, abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
@@ -47,6 +49,43 @@ class AbstractCNN(ABC):
         """Prints the name of the model."""
         print("\n" + self.model_name)
 
+    def print_classification_report(self, X_test, y_test):
+        """Tests the model on a dataset and prints the precision and recall for each category.
+
+        Args:
+            X_test (np.ndarray): The images in the dataset, where each image is represented as a pixel array.
+            y_test (np.ndarray): The labels in the dataset.
+
+        """
+        last_layer_index = len(self.model.layers) - 1
+        last_layer_units = self.model.get_layer(index=last_layer_index).units
+
+        if last_layer_units < 1:
+            print('Classification report could not be created. The final layer in the CNN must have 1 or more units.')
+            return
+        elif last_layer_units == 1:
+            print('Implement this')
+            y_pred = None
+        else:
+            y_probabilities = self.model.predict(X_test)
+            y_pred = tf.argmax(y_probabilities, axis=-1)
+
+        print('Classification report:')
+        print(classification_report(y_test, y_pred))
+        # self.model.get_layer(len(self.model.layers) - 1)
+        # classification_dict.pop('macro avg')
+        # classification_dict.pop('weighted avg')
+        # classification_dict.pop('accuracy')
+        # print('Precision and recall per category:')
+        # for category, values in classification_dict.items():
+        #     precision = round(values['precision'] * 100, 2)
+        #     recall = round(values['recall'] * 100, 2)
+        #     print(f'{category}: precision={precision}, recall={recall}')
+
+    def summary(self):
+        """Prints information about the architecture of the model."""
+        self.model.summary()
+
     @abstractmethod
     def create_model(self):
         """Creates the model.
@@ -81,6 +120,8 @@ class AbstractCNN(ABC):
                 saved using this name.
 
         """
+        callbacks = []
+
         if isinstance(save_name, str) and len(save_name) > 0 and str.isspace(save_name) is False:
             # Settings to save the model
             model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
@@ -89,11 +130,8 @@ class AbstractCNN(ABC):
                 mode='min',
                 save_best_only=True
             )
-            callbacks = [model_checkpoint_callback]
+            callbacks.append(model_checkpoint_callback)
             self.model_name = save_name
-        else:
-            # Settings to NOT save the model
-            callbacks = []
 
         # Train the model
         try:
@@ -150,9 +188,10 @@ class AbstractCNN(ABC):
             print('The model must be compiled before training/testing. Use compile_model(optimizer, loss)')
 
         self.print_model_name()
-        print('Accuracy: {}%'.format((round(acc * 100, 2))))
-        print('Number of correct predictions: {}/{}'.format(round(len(X_test) * acc), len(X_test)))
-        print('Loss: {}'.format(round(loss, 6)))
+        print(f'Loss: {round(loss, 6)}')
+        print(f'Accuracy: {round(acc * 100, 2)}%')
+        print(f'Number of correct predictions: {round(len(X_test) * acc)}/{len(X_test)}')
+        self.print_classification_report(X_test, y_test)
 
     def save_model(self, model_name):
         """Saves the current CNN model in the 'saved_models' folder.
@@ -166,10 +205,6 @@ class AbstractCNN(ABC):
             self.model_name = model_name
         else:
             print('The model could not be saved. An invalid name was used.')
-
-    def summary(self):
-        """Prints information about the architecture of the model."""
-        self.model.summary()
 
     def kfold_cross_validation(self, X, y, n_splits):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
@@ -213,16 +248,13 @@ class AbstractCNN(ABC):
             # Test the cloned model on the test data, then print the results
             loss, acc = cloned_model.evaluate(X_test, y_test, verbose=0)
             accuracy_scores.append(acc)
-            print(f'\nFold {fold_num} test dataset results:')
-            print(f'Accuracy: {round(acc * 100, 2)}%')
-            print(f'Loss: {loss}')
-            fold_num += 1
 
-        # Print overall k-fold cross validation results
-        print(f'\n{n_splits}-Fold Cross Validation: {self.model_name}')
-        print('Max accuracy: {}% '.format(round(np.max(accuracy_scores) * 100, 2)))
-        print('Min accuracy: {}% '.format(round(np.min(accuracy_scores) * 100, 2)))
-        print('Average accuracy: {}% '.format(round(np.average(accuracy_scores) * 100, 2)))
+            print(f'\nFold {fold_num} results on test dataset:')
+            print(f'Loss: {loss}')
+            print(f'Accuracy: {round(acc * 100, 2)}%')
+            print(f'Number of correct predictions: {round(len(X_test) * acc)}/{len(X_test)}')
+            self.print_classification_report(X_test, y_test)
+            fold_num += 1
 
 
 class LoadedCNN(AbstractCNN):
@@ -307,6 +339,6 @@ class CNN(AbstractCNN):
             layers.Flatten(),
             layers.Dense(128),
             layers.Dense(64),
-            layers.Dense(1)
+            layers.Dense(2)
         ])
         return model, model_name

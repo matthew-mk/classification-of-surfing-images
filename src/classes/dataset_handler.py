@@ -219,7 +219,9 @@ class CNNDatasetHandler(AbstractDatasetHandler):
             self.X, self.y = np.array(self.X), np.array(self.y)
             self.X = self.X.reshape(len(self.X), self.image_height, self.image_width, self.num_channels)
             if print_info:
-                print(f'Dataset created that contains {len(self.X)} images from {len(datasets_to_load)} location(s)')
+                location_text = 'location' if len(datasets_to_load) == 1 else 'locations'
+                print(f'Dataset created that contains {len(self.X)} images from {len(datasets_to_load)} '
+                      f'{location_text}')
 
     def train_test_split(self, test_size, train_test_seed, val_seed):
         """Splits the dataset (X and y) into datasets that can be used for training, validation and testing.
