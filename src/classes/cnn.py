@@ -1,5 +1,6 @@
 """This module defines an abstract base class that contains common functionality for CNN models. There are also
 subclasses that inherit from the base class, which are particular implementations of a CNN. """
+import copy
 
 from utils.helper_utils import *
 import tensorflow as tf
@@ -7,9 +8,10 @@ from tensorflow import keras
 from keras import layers
 from keras.callbacks import History
 from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
 from abc import ABC, abstractmethod
 import matplotlib.pyplot as plt
+import seaborn as sn
 import numpy as np
 
 
@@ -61,26 +63,16 @@ class AbstractCNN(ABC):
         last_layer_units = self.model.get_layer(index=last_layer_index).units
 
         if last_layer_units < 1:
-            print('Classification report could not be created. The final layer in the CNN must have 1 or more units.')
+            print('Classification report could not be created. The final layer in the CNN must contain at least 1 unit.')
             return
         elif last_layer_units == 1:
-            print('Implement this')
-            y_pred = None
+            y_pred = (self.model.predict(X_test) > 0.5).astype("int32")
         else:
             y_probabilities = self.model.predict(X_test)
             y_pred = tf.argmax(y_probabilities, axis=-1)
 
         print('Classification report:')
         print(classification_report(y_test, y_pred))
-        # self.model.get_layer(len(self.model.layers) - 1)
-        # classification_dict.pop('macro avg')
-        # classification_dict.pop('weighted avg')
-        # classification_dict.pop('accuracy')
-        # print('Precision and recall per category:')
-        # for category, values in classification_dict.items():
-        #     precision = round(values['precision'] * 100, 2)
-        #     recall = round(values['recall'] * 100, 2)
-        #     print(f'{category}: precision={precision}, recall={recall}')
 
     def summary(self):
         """Prints information about the architecture of the model."""
@@ -174,6 +166,21 @@ class AbstractCNN(ABC):
         except KeyError:
             raise
 
+    def plot_confusion_matrix(self, y_test, y_pred):
+        """Creates a confusion matrix showing the model's predictions versus what the correct answers were.
+
+        Args:
+            y_test (list[int]): The labels of the images in the dataset.
+            y_pred (list[int]): The predictions that the model made.
+
+        """
+        cm = confusion_matrix(y_test, y_pred)
+        plt.figure(figsize=(4, 4))
+        sn.heatmap(cm, annot=True)
+        plt.xlabel('Predicted')
+        plt.ylabel('Truth')
+        plt.show()
+
     def test_model(self, X_test, y_test):
         """Tests the model on a dataset and prints the accuracy, number of correct predictions, and loss.
 
@@ -206,7 +213,7 @@ class AbstractCNN(ABC):
         else:
             print('The model could not be saved. An invalid name was used.')
 
-    def kfold_cross_validation(self, X, y, n_splits):
+    def kfold_cross_validation(self, X, y, n_splits, test_size):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
 
         Note: This function will only return legitimate results if the model has not been trained on the dataset that is
@@ -216,44 +223,28 @@ class AbstractCNN(ABC):
             X (np.ndarray): The images in the dataset, where each image is represented as a list of pixel values.
             y (np.ndarray): The labels of the images.
             n_splits (int): The number of folds the dataset will be divided into.
+            test_size (float): The proportion of images that will be used for testing in each fold. Ranges from 0-1.
+                E.g. 0.2 means 20% of images will be used for testing.
 
         """
-        fold_num = 1
+        skf = StratifiedShuffleSplit(n_splits=n_splits, test_size=test_size)
         X = np.array(X)
         y = np.array(y)
-        accuracy_scores = []
-        skf = StratifiedShuffleSplit(n_splits=n_splits, test_size=0.2)
+        default_weights = self.model.get_weights()
+        fold_num = 1
 
         for train_index, test_index in skf.split(X, y):
             # Set up training, validation, and test datasets for the current fold
             X = X.reshape(len(X), self.image_height, self.image_width, self.num_channels)
-            X_train, X_test = X[train_index], X[test_index]
-            y_train, y_test = y[train_index], y[test_index]
+            X_train, X_test, y_train, y_test = X[train_index], X[test_index], y[train_index], y[test_index]
             X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2)
 
-            # Create a clone of the current model and compile it
-            cloned_model = keras.models.clone_model(self.model)
-            cloned_model.compile(optimizer=self.optimizer, loss=self.loss, metrics=self.metrics)
-
-            # Train the cloned model using the training and validation data
-            print(f'\nTraining on fold {fold_num}')
-            cloned_model.fit(
-                X_train,
-                y_train,
-                validation_data=(X_val, y_val),
-                epochs=self.epochs,
-                batch_size=self.batch_size
-            )
-
-            # Test the cloned model on the test data, then print the results
-            loss, acc = cloned_model.evaluate(X_test, y_test, verbose=0)
-            accuracy_scores.append(acc)
-
-            print(f'\nFold {fold_num} results on test dataset:')
-            print(f'Loss: {loss}')
-            print(f'Accuracy: {round(acc * 100, 2)}%')
-            print(f'Number of correct predictions: {round(len(X_test) * acc)}/{len(X_test)}')
-            self.print_classification_report(X_test, y_test)
+            # Train and test the model on the current fold
+            print(f'\nTraining on fold {fold_num}...')
+            self.model.set_weights(default_weights)
+            self.train_model(X_train, X_val, y_train, y_val)
+            print(f'\nFold {fold_num} test dataset results:')
+            self.test_model(X_test, y_test)
             fold_num += 1
 
 
@@ -339,6 +330,6 @@ class CNN(AbstractCNN):
             layers.Flatten(),
             layers.Dense(128),
             layers.Dense(64),
-            layers.Dense(2)
+            layers.Dense(1)
         ])
         return model, model_name

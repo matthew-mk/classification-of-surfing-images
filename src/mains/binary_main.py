@@ -1,8 +1,8 @@
 """This module trains models to classify images of surfing locations based on whether the conditions in the images are
 suitable for surfing or not (binary classification). The models can be trained using images from 1 to 5 surfing
 locations."""
-import keras.losses
 
+import keras.losses
 from utils.train_test_utils import *
 
 DATASET_TYPE = 'binary'
@@ -36,13 +36,13 @@ CONFIGS = {
 def main():
     # Create instances of the models
     cnn = CNN(CONFIGS['cnn'])
-    cnn.compile_model(keras.optimizers.Adam(), keras.losses.SparseCategoricalCrossentropy(from_logits=True))
+    cnn.compile_model(keras.optimizers.Adam(), keras.losses.BinaryCrossentropy(from_logits=True))
     svm = SVM()
     rf = RF()
     knn = KNN()
 
     # Train a single model
-    train_and_test_model(cnn, BEST_SEEDS['cnn'], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
+    # train_and_test_model(cnn, BEST_SEEDS['cnn'], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
 
     # Train multiple models
     # models_and_seeds = [(cnn, BEST_SEEDS['cnn']), (svm, BEST_SEEDS['svm']), (rf, BEST_SEEDS['rf']),
@@ -50,7 +50,7 @@ def main():
     # train_and_test_models(models_and_seeds, DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
 
     # Apply k-fold cross validation to one or more models
-    # k_fold_cross_validation([cnn, svm, rf, knn], DATASETS_TO_LOAD, CATEGORIES, K_FOLD_SPLITS, CONFIGS)
+    k_fold_cross_validation([svm], DATASETS_TO_LOAD, CATEGORIES, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
 
     # Test the models that have been saved that were trained on images from a single surfing location (Bantham beach)
     # test_saved_basic_models()

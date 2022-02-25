@@ -69,7 +69,7 @@ def train_and_test_models(models_and_seeds, datasets_to_load, categories, test_s
         train_and_test_model(model, seed, datasets_to_load, categories, test_size, configs)
 
 
-def k_fold_cross_validation(models, datasets_to_load, categories, num_splits, configs):
+def k_fold_cross_validation(models, datasets_to_load, categories, num_splits, test_size, configs):
     """Performs k-fold cross validation on models. 80% of the images are used for training and 20% for testing.
 
     Args:
@@ -78,6 +78,8 @@ def k_fold_cross_validation(models, datasets_to_load, categories, num_splits, co
         categories (list[str]): The categories that the images in the datasets are categorized into.
         num_splits (int): The number of different ways in which the dataset will be split for k-fold cross
             validation.
+        test_size (float): The proportion of images that will be used for testing in each fold. Ranges from 0-1. E.g.
+            0.2 means 20% of images will be used for testing.
         configs (dict): Configuration settings used to set up the datasets for the Scikit-learn models and CNN models.
             Also includes training settings for CNN models.
 
@@ -90,7 +92,7 @@ def k_fold_cross_validation(models, datasets_to_load, categories, num_splits, co
             cnn_dataset_handler.create_dataset(datasets_to_load, categories, print_info=True)
             X, y = cnn_dataset_handler.get_X_and_y()
             # K-Fold Cross Validation
-            model.kfold_cross_validation(X, y, num_splits)
+            model.kfold_cross_validation(X, y, num_splits, test_size)
         elif issubclass(type(model), AbstractSklearn):
             # The model is a Scikit-learn model
             # Set up datasets
@@ -98,7 +100,7 @@ def k_fold_cross_validation(models, datasets_to_load, categories, num_splits, co
             sklearn_dataset_handler.create_dataset(datasets_to_load, categories, print_info=True)
             X, y = sklearn_dataset_handler.get_X_and_y()
             # K-Fold Cross Validation
-            model.kfold_cross_validation(X, y, num_splits)
+            model.kfold_cross_validation(X, y, num_splits, test_size)
         else:
             # The model is not a Scikit-learn or CNN model
             raise ValueError("An invalid model was given as input. Each model must be a Scikit-learn or CNN model.")
@@ -187,7 +189,7 @@ def test_saved_basic_models():
     X_train, X_val, X_test, y_train, y_val, y_test = cnn_dataset_handler.train_test_split(0.2, 3, 1)
 
     # Test the loaded CNN model
-    print('\nPerformance on binary_1 dataset (the one the models were trained on):')
+    print('\nPerformance on binary_1 dataset (the dataset the models were trained on):')
     loaded_cnn.test_model(X_test, y_test)
 
     # Setup datasets for the loaded Scikit-learn models

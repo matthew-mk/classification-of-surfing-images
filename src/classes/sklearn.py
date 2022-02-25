@@ -1,8 +1,10 @@
 """This module defines an abstract base class that contains common functionality for Scikit-learn models. There are also
 subclasses that inherit from the base class, including particular implementations of SVM, RF, and KNN models. """
+import copy
 
+from sklearn.base import clone
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.model_selection import cross_validate
+from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -64,16 +66,15 @@ class AbstractSklearn(ABC):
         if return_acc:
             return round(acc * 100, 2)
 
-    def plot_confusion_matrix(self, X_test, y_test):
+    def plot_confusion_matrix(self, y_test, y_pred):
         """Creates a confusion matrix showing the model's predictions versus what the correct answers were.
 
         Args:
-            X_test (list[list]): The images in the dataset, where each image is represented as a pixel array.
             y_test (list[int]): The labels of the images in the dataset.
+            y_pred (list[int]): The predictions that the model made.
 
         """
-        y_predicted = self.model.predict(X_test)
-        cm = confusion_matrix(y_test, y_predicted)
+        cm = confusion_matrix(y_test, y_pred)
         plt.figure(figsize=(4, 4))
         sn.heatmap(cm, annot=True)
         plt.xlabel('Predicted')
@@ -93,55 +94,36 @@ class AbstractSklearn(ABC):
         else:
             print('The model could not be saved. An invalid name was used.')
 
-    def kfold_cross_validation(self, X, y, n_splits):
+    def kfold_cross_validation(self, X, y, n_splits, test_size):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
 
         Note: This function will only return legitimate results if the model has not been trained on the dataset that is
         used.
 
         Args:
-            X (list[list]): The images in the dataset, where each image is represented as a list of pixel values.
-            y (list[int]): The labels of the images.
+            X (np.ndarray): The images in the dataset, where each image is represented as a list of pixel values.
+            y (np.ndarray): The labels of the images.
             n_splits (int): The number of folds the dataset will be divided into.
+            test_size (float): The proportion of images that will be used for testing in each fold. Ranges from 0-1.
+                E.g. 0.2 means 20% of images will be used for testing.
 
         """
-        # Conduct K-Fold Cross Validation
-        scoring_types = ['accuracy', 'precision', 'recall', 'f1']
-        cv_results = cross_validate(self.model, X, y, cv=n_splits, scoring=scoring_types)
+        skf = StratifiedShuffleSplit(n_splits=n_splits, test_size=test_size)
+        X = np.array(X)
+        y = np.array(y)
+        fold_num = 1
 
-        # Change the formatting of all the results to have 2 decimal places
-        for scoring_type in scoring_types:
-            cv_result = cv_results[f'test_{scoring_type}']
-            index = 0
-            for _ in cv_result:
-                cv_result[index] = np.round(cv_result[index] * 100, 2)
-                index += 1
+        for train_index, test_index in skf.split(X, y):
+            # Set up the training and test datasets for the current fold
+            X_train, X_test, y_train, y_test = X[train_index], X[test_index], y[train_index], y[test_index]
 
-        accuracy_results = cv_results['test_accuracy']
-        precision_results = cv_results['test_precision']
-        recall_results = cv_results['test_recall']
-        f1_results = cv_results['test_f1']
-
-        # Print results from each fold
-        print(f'\n{n_splits}-Fold Cross Validation: {self.model_name}')
-        for i in range(0, n_splits):
-            fold_accuracy = f'{accuracy_results[i]}%'
-            fold_precision = f'{precision_results[i]}%'
-            fold_recall = f'{recall_results[i]}%'
-            fold_f1 = f1_results[i]
-            print(f'Fold {i + 1}: accuracy={fold_accuracy}, precision={fold_precision}, ' +
-                  f'recall={fold_recall}, f1={fold_f1}')
-
-        # Overall results
-        print("\nOverall stats: ")
-        for scoring_type in scoring_types:
-            if scoring_type == 'f1':
-                ending = ''
-            else:
-                ending = '%'
-            cv_result = cv_results[f'test_{scoring_type}']
-            print(f'{scoring_type}: maximum={np.max(cv_result)}{ending}, minimum={np.min(cv_result)}{ending}, ' +
-                  f'average={np.average(cv_result)}{ending}')
+            # Train and test the model on the current fold
+            print(f'\nTraining on fold {fold_num}...')
+            cloned_model = copy.deepcopy(self)
+            cloned_model.train_model(X_train, y_train)
+            print(f'Fold {fold_num} test dataset results:')
+            cloned_model.test_model(X_test, y_test)
+            fold_num += 1
 
 
 class LoadedSklearn(AbstractSklearn):
