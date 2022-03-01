@@ -14,10 +14,10 @@ An object-oriented system that can be used to create, train, test, and evaluate 
 ├── saved_models 	                        - Stores the models that the user chooses to save.
 └── src    		   		                    - The source code.
     ├── classes
-    |   ├── cnn.py                          - Classes for creating CNN models using Keras.
-    |   ├── dataset_handler.py              - Classes for loading and preprocessing datasets for CNN and Scikit-learn models.
-    |   └── sklearn.py                      - Classes for creating models using Scikit-learn.
-    |
+    │   ├── cnn.py                          - Classes for creating CNN models using Keras.
+    │   ├── dataset_handler.py              - Classes for loading and preprocessing datasets for CNN and Scikit-learn models.
+    │   └── sklearn.py                      - Classes for creating models using Scikit-learn.
+    │
     ├── mains	      	                    - Main files where models are initialized, trained, tested, and evaluated.
     ├── tests	      	                    - Functionality for testing the code.
     └── utils
