@@ -1,4 +1,4 @@
-"""This module contains functions for training, testing, and evaluating models."""
+"""This module contains utility functions for training, testing, and evaluating models."""
 
 from classes.cnn import *
 from classes.sklearn import *

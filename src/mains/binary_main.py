@@ -7,10 +7,9 @@ from utils.train_test_utils import *
 
 DATASET_TYPE = 'binary'
 CATEGORIES = ['unsurfable', 'surfable']
-NUM_LOCATIONS = 1
+NUM_LOCATIONS = 2
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 3
-NUM_SEEDS_TO_TEST = 10
 DATASETS_TO_LOAD = AbstractDatasetHandler.get_dataset_names(DATASET_TYPE, NUM_LOCATIONS)
 BEST_SEEDS = {
     'cnn': get_seed([3, 0, 0, 0, 123], NUM_LOCATIONS),
@@ -24,7 +23,7 @@ CONFIGS = {
         'image_width': 40,
         'color_mode': 'rgb',
         'batch_size': 16,
-        'epochs': 10
+        'epochs': 50
     },
     'sklearn': {
         'image_height': 128,
@@ -35,14 +34,16 @@ CONFIGS = {
 
 def main():
     # Create instances of the models
-    cnn = CNN(CONFIGS['cnn'])
-    cnn.compile_model(keras.optimizers.Adam(), keras.losses.BinaryCrossentropy(from_logits=True))
+    linear_cnn = LinearCNN(CONFIGS['cnn'])
+    linear_cnn.compile_model(keras.optimizers.Adam(), keras.losses.BinaryCrossentropy(from_logits=True))
+    nonlinear_cnn = NonLinearCNN(CONFIGS['cnn'])
+    nonlinear_cnn.compile_model(keras.optimizers.Adam(), keras.losses.SparseCategoricalCrossentropy())
     svm = SVM()
     rf = RF()
     knn = KNN()
 
     # Train a single model
-    # train_and_test_model(cnn, BEST_SEEDS['cnn'], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
+    # train_and_test_model(linear_cnn, BEST_SEEDS['cnn'], DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
 
     # Train multiple models
     # models_and_seeds = [(cnn, BEST_SEEDS['cnn']), (svm, BEST_SEEDS['svm']), (rf, BEST_SEEDS['rf']),
@@ -50,7 +51,7 @@ def main():
     # train_and_test_models(models_and_seeds, DATASETS_TO_LOAD, CATEGORIES, TEST_SIZE, CONFIGS)
 
     # Apply k-fold cross validation to one or more models
-    k_fold_cross_validation([svm], DATASETS_TO_LOAD, CATEGORIES, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
+    # k_fold_cross_validation([linear_cnn], DATASETS_TO_LOAD, CATEGORIES, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
 
     # Test the models that have been saved that were trained on images from a single surfing location (Bantham beach)
     # test_saved_basic_models()
