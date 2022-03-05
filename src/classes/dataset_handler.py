@@ -29,27 +29,28 @@ class AbstractDatasetHandler(ABC):
         self.X_test, self.y_test = [], []
 
     @staticmethod
-    def get_dataset_names(dataset_type, num_locations):
-        """Creates a list of dataset names based on the information that is passed in.
+    def get_categories(enclosing_folder):
+        """Returns the categories that datasets in a particular folder have.
+
+        For example, binary datasets have the categories 'unsurfable' and 'surfable', so ['unsurfable','surfable'] is
+        returned.
 
         Args:
-            dataset_type (str): The type of dataset, e.g. 'binary' or 'rating'.
-            num_locations (int): The number of locations (or directories) to load images from.
+            enclosing_folder (str): The enclosing folder of the datasets. E.g. 'binary' or 'rating'.
 
         Returns:
-            dataset_names (list[str]): The list of dataset names.
+            categories (list[str]): The categories in those types of datasets.
 
         """
-        dataset_names = []
-        if num_locations > 0:
-            for i in range(1, num_locations + 1):
-                dataset_names.append(f'{dataset_type}_{i}')
+        if enclosing_folder == 'binary':
+            return ['unsurfable', 'surfable']
+        elif enclosing_folder == 'rating':
+            return ['1', '2', '3', '4', '5']
         else:
-            raise ValueError("The number of locations must be greater than 0.")
+            print("An invalid input was given. Must be 'binary' or 'rating'.")
+            return []
 
-        return dataset_names
-
-    def create_dataset(self, datasets_to_load, categories, print_info=False):
+    def create_dataset(self, enclosing_folder, datasets_to_load, print_info=False):
         """Loads images from one or more datasets, does some preprocessing, and merges them into one dataset.
 
         Each image is assigned a label and converted to be the size and color mode defined by this class. In addition,
@@ -57,23 +58,24 @@ class AbstractDatasetHandler(ABC):
         normalized.
 
         Args:
+            enclosing_folder (str): The folder containing the datasets to be loaded. E.g. 'binary' or 'rating'.
             datasets_to_load (list[str]): The names of the datasets to load images from.
-            categories (list[str]): The categories (also known as classes) in the datasets. Each dataset should have
-                the same categories.
             print_info: (bool): Optional parameter, defaults to False. If set to true, it will print information about
                 the progress being made loading the data.
 
         """
         self.X = []
         self.y = []
+        categories = self.get_categories(enclosing_folder)
+
         if print_info:
             print()
         if len(datasets_to_load) > 0:
             for dataset_name in datasets_to_load:
                 if print_info:
-                    print(f'Loading images from {dataset_name}...')
+                    print(f"Loading images from '{dataset_name}' dataset...")
                 for category in categories:
-                    category_path = os.path.join(f"../datasets/{dataset_name}", category)
+                    category_path = os.path.join(f"../datasets/{enclosing_folder}/{dataset_name}", category)
                     category_label = categories.index(category)
                     for file in os.listdir(category_path):
                         if file.endswith('.png'):
@@ -179,7 +181,7 @@ class CNNDatasetHandler(AbstractDatasetHandler):
         super().__init__(config)
         self.X_val, self.y_val = [], []
 
-    def create_dataset(self, datasets_to_load, categories, print_info=False):
+    def create_dataset(self, enclosing_folder, datasets_to_load, print_info=False):
         """Loads images from one or more datasets, does some preprocessing, and merges them into one dataset.
 
         Each image is assigned a label and converted to be the size and color mode defined by this class. In addition,
@@ -187,23 +189,24 @@ class CNNDatasetHandler(AbstractDatasetHandler):
         normalized.
 
         Args:
+            enclosing_folder (str): The folder containing the datasets to be loaded. E.g. 'binary' or 'rating'.
             datasets_to_load (list[str]): The names of the datasets to load images from.
-            categories (list[str]): The categories (also known as classes) in the datasets. Each dataset should have
-                the same categories.
             print_info: (bool): Optional parameter, defaults to False. If set to true, it will print information about
                 the progress being made loading the data.
 
         """
         self.X = []
         self.y = []
+        categories = self.get_categories(enclosing_folder)
+
         if print_info:
             print()
         if len(datasets_to_load) > 0:
             for dataset_name in datasets_to_load:
                 if print_info:
-                    print(f'Loading images from {dataset_name}...')
+                    print(f"Loading images from '{dataset_name}' dataset...")
                 for category in categories:
-                    category_path = os.path.join(f"../datasets/{dataset_name}", category)
+                    category_path = os.path.join(f"../datasets/{enclosing_folder}/{dataset_name}", category)
                     category_label = categories.index(category)
                     for file in os.listdir(category_path):
                         if file.endswith('.png'):
