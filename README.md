@@ -5,22 +5,22 @@ An object-oriented system that can be used to create, train, test, and evaluate 
 ## Project Structure
 
 ```
-├── datasets                                - Datasets containing images from different surfing locations.
+├── datasets
 │   ├── binary                              - Datasets for binary classification. Images are classed as surfable or unsurfable.
 │   └── rating                              - Datasets for multiclass classification. Images are rated from 1-5.
 │
 ├── documentation                           - Project documentation.
-├── saved_models 	                        - The models that are saved by the user.
-└── src    		   		                    - The source code.
+├── saved_models 	                    - The models that are saved by the user.
+└── src    		   		    - The source code.
     ├── classes
     │   ├── cnn.py                          - Classes for creating CNN models using Keras.
     │   ├── dataset_handler.py              - Classes for loading and preprocessing datasets.
     │   └── sklearn.py                      - Classes for creating models using Scikit-learn.
     │
-    ├── mains	      	                    - Contains 'main' files where models are initialized, trained, tested, and evaluated.
+    ├── mains	      	                    - The 'main' files where models are initialized, trained, tested, and evaluated.
     ├── tests	      	                    - Functionality for testing the code.
     └── utils
-        ├── helper_utils.py                 - Utility functions that help various parts of the system.
+        ├── helper_utils.py                 - Utility functions that help with various parts of the system.
         └── train_test_utils.py             - Utility functions for training, testing, and evaluating models.
 ```
 
