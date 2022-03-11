@@ -89,7 +89,7 @@ class AbstractSklearn(ABC):
 
         """
         if isinstance(model_name, str) and len(model_name) > 0 and str.isspace(model_name) is False:
-            pickle.dump(self.model, open('../saved_models/{}.sav'.format(model_name), 'wb'))
+            pickle.dump(self.model, open('../../saved_models/{}.sav'.format(model_name), 'wb'))
             self.model_name = model_name
         else:
             print('The model could not be saved. An invalid name was used.')
@@ -150,7 +150,7 @@ class LoadedSklearn(AbstractSklearn):
 
         """
         try:
-            self.model = pickle.load(open('../saved_models/{}.sav'.format(model_name), 'rb'))
+            self.model = pickle.load(open('../../saved_models/{}.sav'.format(model_name), 'rb'))
             self.model_name = model_name
         except TypeError as e:
             print('Model could not be loaded')
@@ -180,7 +180,6 @@ class SVM(AbstractSklearn):
         model_name = 'svm_model'
         return model, model_name
 
-
 class RF(AbstractSklearn):
     """An implementation of a Scikit-learn Random Forest model."""
 
@@ -201,8 +200,7 @@ class RF(AbstractSklearn):
         model_name = 'rf_model'
         return model, model_name
 
-
-class KNN(AbstractSklearn):
+class BinaryKNN(AbstractSklearn):
     """An implementation of a Scikit-learn K-nearest Neighbors model."""
 
     def __init__(self):
@@ -220,4 +218,24 @@ class KNN(AbstractSklearn):
         """
         model = KNeighborsClassifier(n_neighbors=1)
         model_name = 'knn_model'
+        return model, model_name
+
+class RatingKNN(AbstractSklearn):
+    """An implementation of a Scikit-learn K-nearest Neighbors model."""
+
+    def __init__(self):
+        """Initializes a Scikit-learn model."""
+        super().__init__()
+
+    def create_model(self):
+        """Creates the Scikit-learn model.
+
+        Returns:
+            tuple containing:
+                - model: The Scikit-learn model.
+                - model_name (str): The name of the model.
+
+        """
+        model = KNeighborsClassifier(n_neighbors=30)
+        model_name = 'rating_knn'
         return model, model_name

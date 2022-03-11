@@ -1,6 +1,5 @@
 """This module defines an abstract base class that contains common functionality for CNN models. There are also
 subclasses that inherit from the base class, which are particular implementations of a CNN. """
-import copy
 
 from utils.helper_utils import *
 import tensorflow as tf
@@ -117,7 +116,7 @@ class AbstractCNN(ABC):
         if isinstance(save_name, str) and len(save_name) > 0 and str.isspace(save_name) is False:
             # Settings to save the model
             model_checkpoint_callback = keras.callbacks.ModelCheckpoint(
-                '../saved_models/{}.h5'.format(save_name),
+                '../../saved_models/{}.h5'.format(save_name),
                 monitor='val_loss',
                 mode='min',
                 save_best_only=True
@@ -208,7 +207,7 @@ class AbstractCNN(ABC):
 
         """
         if isinstance(model_name, str) and len(model_name) > 0 and str.isspace(model_name) is False:
-            self.model.save('../saved_models/{}.h5'.format(model_name))
+            self.model.save('../../saved_models/{}.h5'.format(model_name))
             self.model_name = model_name
         else:
             print('The model could not be saved. An invalid name was used.')
@@ -282,7 +281,7 @@ class LoadedCNN(AbstractCNN):
 
         """
         try:
-            self.model = keras.models.load_model('../saved_models/{}.h5'.format(model_name))
+            self.model = keras.models.load_model('../../saved_models/{}.h5'.format(model_name))
             self.model_name = model_name
         except TypeError as e:
             print('Model could not be loaded')
@@ -307,7 +306,7 @@ class LinearCNN(AbstractCNN):
                 - model_name (str): The name of the model.
 
         """
-        model_name = 'cnn_model'
+        model_name = 'linear_cnn'
         data_augmentation = keras.Sequential([
             layers.RandomFlip("horizontal", input_shape=(self.image_height, self.image_width, self.num_channels)),
             layers.RandomRotation(0.1),
@@ -350,7 +349,7 @@ class NonLinearCNN(AbstractCNN):
                 - model_name (str): The name of the model.
 
         """
-        model_name = 'cnn_model'
+        model_name = 'non_linear_cnn'
         data_augmentation = keras.Sequential([
             layers.RandomFlip("horizontal", input_shape=(self.image_height, self.image_width, self.num_channels)),
             layers.RandomRotation(0.1),
@@ -374,5 +373,46 @@ class NonLinearCNN(AbstractCNN):
             layers.Dense(128),
             layers.Dense(64),
             layers.Dense(2, activation='softmax')
+        ])
+        return model, model_name
+
+class RatingCNN(AbstractCNN):
+    """A CNN model that is used for the datasets that rate images from 1-5."""
+
+    def __init__(self, config):
+        """Initializes the CNN model."""
+        super().__init__(config)
+
+    def create_model(self):
+        """Creates the CNN model.
+
+        Returns:
+            tuple containing:
+                - model (keras.Model): The CNN model.
+                - model_name (str): The name of the model.
+
+        """
+        model_name = 'rating_cnn'
+        data_augmentation = keras.Sequential([
+            layers.RandomFlip("horizontal", input_shape=(self.image_height, self.image_width, self.num_channels)),
+            layers.RandomRotation(0.1),
+            layers.RandomZoom(0.1),
+        ])
+        model = keras.Sequential([
+            data_augmentation,
+            layers.Input((self.image_height, self.image_width, self.num_channels)),
+            layers.Conv2D(16, 3, padding='same', activation='relu'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(32, 3, padding='same', activation='relu'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(64, 3, padding='same', activation='relu'),
+            layers.MaxPooling2D(),
+            layers.Conv2D(128, 3, padding='same', activation='relu'),
+            layers.MaxPooling2D(),
+            layers.Dropout(0.2),
+            layers.Flatten(),
+            layers.Dense(128),
+            layers.Dense(64),
+            layers.Dense(5, activation='softmax')
         ])
         return model, model_name

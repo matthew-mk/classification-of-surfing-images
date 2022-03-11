@@ -75,7 +75,7 @@ class AbstractDatasetHandler(ABC):
                 if print_info:
                     print(f"Loading images from '{dataset_name}' dataset...")
                 for category in categories:
-                    category_path = os.path.join(f"../datasets/{enclosing_folder}/{dataset_name}", category)
+                    category_path = os.path.join(f"../../datasets/{enclosing_folder}/{dataset_name}", category)
                     category_label = categories.index(category)
                     for file in os.listdir(category_path):
                         if file.endswith('.png'):
@@ -206,7 +206,7 @@ class CNNDatasetHandler(AbstractDatasetHandler):
                 if print_info:
                     print(f"Loading images from '{dataset_name}' dataset...")
                 for category in categories:
-                    category_path = os.path.join(f"../datasets/{enclosing_folder}/{dataset_name}", category)
+                    category_path = os.path.join(f"../../datasets/{enclosing_folder}/{dataset_name}", category)
                     category_label = categories.index(category)
                     for file in os.listdir(category_path):
                         if file.endswith('.png'):
