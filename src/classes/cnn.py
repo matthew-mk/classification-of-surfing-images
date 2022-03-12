@@ -108,7 +108,7 @@ class AbstractCNN(ABC):
             y_train (np.ndarray): The training dataset labels.
             y_val (np.ndarray): The validation dataset labels.
             save_name (str): Optional parameter, defaults to None. If included, the best model during training will be
-                saved using this name.
+                saved using this name. The best model is classed as the model with the smallest validation loss.
 
         """
         callbacks = []
@@ -291,7 +291,7 @@ class LoadedCNN(AbstractCNN):
             print(e)
 
 class LinearCNN(AbstractCNN):
-    """A CNN model that does not contain non-linear activation functions."""
+    """A CNN model that does not have non-linear activation functions."""
 
     def __init__(self, config):
         """Initializes the CNN model."""
@@ -333,8 +333,8 @@ class LinearCNN(AbstractCNN):
         ])
         return model, model_name
 
-class NonLinearCNN(AbstractCNN):
-    """A CNN model that contains non-linear activation functions."""
+class BinaryCNN(AbstractCNN):
+    """A CNN model that is used for binary classification of surfing images."""
 
     def __init__(self, config):
         """Initializes the CNN model."""
@@ -370,14 +370,14 @@ class NonLinearCNN(AbstractCNN):
             layers.MaxPooling2D(),
             layers.Dropout(0.2),
             layers.Flatten(),
-            layers.Dense(128),
-            layers.Dense(64),
+            layers.Dense(128, activation='relu'),
+            layers.Dense(64, activation='relu'),
             layers.Dense(2, activation='softmax')
         ])
         return model, model_name
 
 class RatingCNN(AbstractCNN):
-    """A CNN model that is used for the datasets that rate images from 1-5."""
+    """A CNN model that is used for multiclass classification of surfing images."""
 
     def __init__(self, config):
         """Initializes the CNN model."""
@@ -411,8 +411,8 @@ class RatingCNN(AbstractCNN):
             layers.MaxPooling2D(),
             layers.Dropout(0.2),
             layers.Flatten(),
-            layers.Dense(128),
-            layers.Dense(64),
+            layers.Dense(128, activation='relu'),
+            layers.Dense(64, activation='relu'),
             layers.Dense(5, activation='softmax')
         ])
         return model, model_name

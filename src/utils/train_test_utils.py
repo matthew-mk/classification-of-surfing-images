@@ -191,7 +191,7 @@ def test_saved_basic_models():
     print('\nPerformance on bantham dataset (the dataset the models were trained on):')
     X_train, X_val, X_test, y_train, y_val, y_test = cnn_dataset_handler.train_test_split(0.2, 3, 1)
     loaded_linear_cnn.test_model(X_test, y_test)
-    X_train, X_val, X_test, y_train, y_val, y_test = cnn_dataset_handler.train_test_split(0.2, 1, 1)
+    X_train, X_val, X_test, y_train, y_val, y_test = cnn_dataset_handler.train_test_split(0.2, 3, 1)
     loaded_non_linear_cnn.test_model(X_test, y_test)
 
     # Setup datasets for the loaded Scikit-learn models

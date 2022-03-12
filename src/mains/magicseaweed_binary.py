@@ -7,7 +7,7 @@ from utils.train_test_utils import *
 
 ENCLOSING_FOLDER = 'binary'
 DATASETS = ['bantham', 'polzeath', 'porthowan', 'praa_sands', 'widemouth_bay']
-NUM_DATASETS_TO_LOAD = 5
+NUM_DATASETS_TO_LOAD = 1
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 5
 CONFIGS = {
@@ -26,7 +26,7 @@ CONFIGS = {
 }
 SEEDS = {
     'linear_cnn': get_seed([3, 0, 4, 2, 123], NUM_DATASETS_TO_LOAD),
-    'non_linear_cnn': get_seed([1, 0, 4, 2, 5], NUM_DATASETS_TO_LOAD),
+    'non_linear_cnn': get_seed([3, 0, 4, 2, 5], NUM_DATASETS_TO_LOAD),
     'svm': get_seed([3, 31, 10, 27, 43], NUM_DATASETS_TO_LOAD),
     'rf': get_seed([3, 22, 10, 47, 21], NUM_DATASETS_TO_LOAD),
     'knn': get_seed([3, 9, 1, 20, 73], NUM_DATASETS_TO_LOAD)
@@ -39,14 +39,14 @@ def main():
     # Create instances of the models
     linear_cnn = LinearCNN(CONFIGS['cnn'])
     linear_cnn.compile_model(keras.optimizers.Adam(), keras.losses.BinaryCrossentropy(from_logits=True))
-    non_linear_cnn = NonLinearCNN(CONFIGS['cnn'])
+    non_linear_cnn = BinaryCNN(CONFIGS['cnn'])
     non_linear_cnn.compile_model(keras.optimizers.Adam(), keras.losses.SparseCategoricalCrossentropy())
     svm = SVM()
     rf = RF()
     knn = BinaryKNN()
 
     # Train a single model
-    train_and_test_model(non_linear_cnn, SEEDS['non_linear_cnn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
+    # train_and_test_model(non_linear_cnn, SEEDS['non_linear_cnn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Train multiple models
     # models_and_seeds = [(linear_cnn, SEEDS['linear_cnn']), (non_linear_cnn, SEEDS['non_linear_cnn']),
@@ -57,7 +57,7 @@ def main():
     # k_fold_cross_validation([cnn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
 
     # Test the models that have been saved that were trained on images from a single surfing location (Bantham beach)
-    # test_saved_basic_models()
+    test_saved_basic_models()
 
     # Test the Scikit-learn models on a specified number of seeds and find the seed that each model performed best on
     # find_best_sklearn_seeds([svm, rf, knn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS, 50)
