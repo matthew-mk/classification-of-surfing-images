@@ -290,49 +290,6 @@ class LoadedCNN(AbstractCNN):
             print('Model could not be loaded')
             print(e)
 
-class LinearCNN(AbstractCNN):
-    """A CNN model that does not have non-linear activation functions."""
-
-    def __init__(self, config):
-        """Initializes the CNN model."""
-        super().__init__(config)
-
-    def create_model(self):
-        """Creates the CNN model.
-
-        Returns:
-            tuple containing:
-                - model (keras.Model): The CNN model.
-                - model_name (str): The name of the model.
-
-        """
-        model_name = 'linear_cnn'
-        data_augmentation = keras.Sequential([
-            layers.RandomFlip("horizontal", input_shape=(self.image_height, self.image_width, self.num_channels)),
-            layers.RandomRotation(0.1),
-            layers.RandomZoom(0.1),
-        ])
-        model = keras.Sequential([
-            data_augmentation,
-            layers.Input((self.image_height, self.image_width, self.num_channels)),
-            layers.Conv2D(16, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(32, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(64, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(128, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(128, 3, padding='same'),
-            layers.MaxPooling2D(),
-            layers.Dropout(0.2),
-            layers.Flatten(),
-            layers.Dense(128),
-            layers.Dense(64),
-            layers.Dense(1)
-        ])
-        return model, model_name
-
 class BinaryCNN(AbstractCNN):
     """A CNN model that is used for binary classification of surfing images."""
 
@@ -349,7 +306,7 @@ class BinaryCNN(AbstractCNN):
                 - model_name (str): The name of the model.
 
         """
-        model_name = 'non_linear_cnn'
+        model_name = 'binary_cnn'
         data_augmentation = keras.Sequential([
             layers.RandomFlip("horizontal", input_shape=(self.image_height, self.image_width, self.num_channels)),
             layers.RandomRotation(0.1),

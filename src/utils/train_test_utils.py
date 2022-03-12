@@ -174,10 +174,8 @@ def test_saved_basic_models():
     }
 
     # Load the models
-    loaded_linear_cnn = LoadedCNN(configs['cnn'])
-    loaded_linear_cnn.load_model('basic_linear_cnn')
-    loaded_non_linear_cnn = LoadedCNN(configs['cnn'])
-    loaded_non_linear_cnn.load_model('basic_non_linear_cnn')
+    loaded_cnn = LoadedCNN(configs['cnn'])
+    loaded_cnn.load_model('basic_cnn')
     loaded_svm = LoadedSklearn()
     loaded_svm.load_model('basic_svm')
     loaded_rf = LoadedSklearn()
@@ -190,9 +188,7 @@ def test_saved_basic_models():
     cnn_dataset_handler.create_dataset('binary', ['bantham'])
     print('\nPerformance on bantham dataset (the dataset the models were trained on):')
     X_train, X_val, X_test, y_train, y_val, y_test = cnn_dataset_handler.train_test_split(0.2, 3, 1)
-    loaded_linear_cnn.test_model(X_test, y_test)
-    X_train, X_val, X_test, y_train, y_val, y_test = cnn_dataset_handler.train_test_split(0.2, 3, 1)
-    loaded_non_linear_cnn.test_model(X_test, y_test)
+    loaded_cnn.test_model(X_test, y_test)
 
     # Setup datasets for the loaded Scikit-learn models
     sklearn_dataset_handler = SklearnDatasetHandler(configs['sklearn'])
@@ -216,9 +212,8 @@ def test_saved_basic_models():
         # Get the images and labels
         X_test, y_test = cnn_dataset_handler.get_X_and_y()
 
-        # Test CNN models
-        loaded_linear_cnn.test_model(X_test, y_test)
-        loaded_non_linear_cnn.test_model(X_test, y_test)
+        # Test CNN model
+        loaded_cnn.test_model(X_test, y_test)
 
         # Set up dataset for Scikit-learn models
         sklearn_dataset_handler.create_dataset('binary', [dataset_name])

@@ -25,8 +25,7 @@ CONFIGS = {
     }
 }
 SEEDS = {
-    'linear_cnn': get_seed([0, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
-    'non_linear_cnn': get_seed([0, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
+    'cnn': get_seed([0, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
     'svm': get_seed([14, 0, 5, 42, 32], NUM_DATASETS_TO_LOAD),
     'rf': get_seed([43, 0, 0, 50, 23], NUM_DATASETS_TO_LOAD),
     'knn': get_seed([50, 0, 8, 47, 43], NUM_DATASETS_TO_LOAD)
@@ -37,24 +36,21 @@ def main():
     DATASETS_TO_LOAD = DATASETS[:NUM_DATASETS_TO_LOAD]
 
     # Create instances of the models
-    linear_cnn = LinearCNN(CONFIGS['cnn'])
-    linear_cnn.compile_model(keras.optimizers.Adam(), keras.losses.BinaryCrossentropy(from_logits=True))
-    non_linear_cnn = NonLinearCNN(CONFIGS['cnn'])
-    non_linear_cnn.compile_model(keras.optimizers.Adam(), keras.losses.SparseCategoricalCrossentropy())
+    cnn = BinaryCNN(CONFIGS['cnn'])
+    cnn.compile_model(keras.optimizers.Adam(), keras.losses.SparseCategoricalCrossentropy())
     svm = SVM()
     rf = RF()
     knn = BinaryKNN()
 
     # Train a single model
-    train_and_test_model(linear_cnn, SEEDS['linear_cnn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
+    train_and_test_model(cnn, SEEDS['cnn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Train multiple models
-    # models_and_seeds = [(non_linear_cnn, SEEDS['non_linear_cnn']), (svm, SEEDS['svm']), (rf, SEEDS['rf']),
-    #                     (knn, SEEDS['knn'])]
+    # models_and_seeds = [(cnn, SEEDS['cnn']), (svm, SEEDS['svm']), (rf, SEEDS['rf']), (knn, SEEDS['knn'])]
     # train_and_test_models(models_and_seeds, ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Apply k-fold cross validation to one or more models
-    # k_fold_cross_validation([non_linear_cnn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
+    # k_fold_cross_validation([cnn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
 
     # Test the Scikit-learn models on a specified number of seeds and find the seed that each model performed best on
     # find_best_sklearn_seeds([svm, rf, knn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS, 50)
