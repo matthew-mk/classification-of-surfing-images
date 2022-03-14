@@ -7,7 +7,7 @@ from utils.train_test_utils import *
 
 ENCLOSING_FOLDER = 'binary'
 DATASETS = ['bantham', 'polzeath', 'porthowan', 'praa_sands', 'widemouth_bay']
-NUM_DATASETS_TO_LOAD = 5
+NUM_DATASETS_TO_LOAD = 1
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 5
 CONFIGS = {
@@ -27,8 +27,8 @@ CONFIGS = {
 SEEDS = {
     'cnn': get_seed([3, 0, 4, 2, 5], NUM_DATASETS_TO_LOAD),
     'svm': get_seed([3, 31, 10, 27, 43], NUM_DATASETS_TO_LOAD),
-    'rf': get_seed([3, 22, 10, 47, 21], NUM_DATASETS_TO_LOAD),
-    'knn': get_seed([3, 9, 1, 20, 73], NUM_DATASETS_TO_LOAD)
+    'rf': get_seed([16, 22, 10, 47, 21], NUM_DATASETS_TO_LOAD),
+    'knn': get_seed([9, 9, 1, 20, 73], NUM_DATASETS_TO_LOAD)
 }
 
 def main():
@@ -43,7 +43,7 @@ def main():
     knn = BinaryKNN()
 
     # Train a single model
-    # train_and_test_model(cnn, SEEDS['cnn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
+    train_and_test_model(knn, SEEDS['knn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Train multiple models
     # models_and_seeds = [(cnn, SEEDS['cnn']), (svm, SEEDS['svm']), (rf, SEEDS['rf']), (knn, SEEDS['knn'])]
@@ -52,7 +52,7 @@ def main():
     # Apply k-fold cross validation to one or more models
     # k_fold_cross_validation([cnn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
 
-    # Test the models that have been saved that were trained on images from a single surfing location (Bantham beach)
+    # Test the models that that were trained on images from the Bantham beach on images from the other locations
     # test_saved_basic_models()
 
     # Test the Scikit-learn models on a specified number of seeds and find the seed that each model performed best on

@@ -7,7 +7,7 @@ from utils.train_test_utils import *
 
 ENCLOSING_FOLDER = 'rating'
 DATASETS = ['bantham', 'polzeath', 'porthowan', 'praa_sands', 'widemouth_bay']
-NUM_DATASETS_TO_LOAD = 1
+NUM_DATASETS_TO_LOAD = 5
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 5
 CONFIGS = {
@@ -26,9 +26,9 @@ CONFIGS = {
 }
 SEEDS = {
     'cnn': get_seed([4, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
-    'svm': get_seed([17, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
-    'rf': get_seed([37, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
-    'knn': get_seed([8, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD)
+    'svm': get_seed([17, 35, 43, 6, 1], NUM_DATASETS_TO_LOAD),
+    'rf': get_seed([37, 3, 8, 32, 1], NUM_DATASETS_TO_LOAD),
+    'knn': get_seed([8, 35, 42, 36, 1], NUM_DATASETS_TO_LOAD)
 }
 
 def main():
@@ -43,10 +43,10 @@ def main():
     knn = RatingKNN()
 
     # Train a single model
-    train_and_test_model(cnn, SEEDS['cnn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
+    train_and_test_model(rf, SEEDS['rf'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Train multiple models
-    # models_and_seeds = [(rating_cnn, SEEDS['cnn']), (svm, SEEDS['svm']), (rf, SEEDS['rf']), (knn, SEEDS['knn'])]
+    # models_and_seeds = [(svm, SEEDS['svm']), (rf, SEEDS['rf']), (knn, SEEDS['knn'])]
     # train_and_test_models(models_and_seeds, ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Apply k-fold cross validation to one or more models

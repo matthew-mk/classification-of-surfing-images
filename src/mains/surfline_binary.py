@@ -25,7 +25,7 @@ CONFIGS = {
     }
 }
 SEEDS = {
-    'cnn': get_seed([0, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
+    'cnn': get_seed([1, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
     'svm': get_seed([14, 0, 5, 42, 32], NUM_DATASETS_TO_LOAD),
     'rf': get_seed([43, 0, 0, 50, 23], NUM_DATASETS_TO_LOAD),
     'knn': get_seed([50, 0, 8, 47, 43], NUM_DATASETS_TO_LOAD)

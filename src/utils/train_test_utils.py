@@ -194,10 +194,10 @@ def test_saved_basic_models():
     sklearn_dataset_handler = SklearnDatasetHandler(configs['sklearn'])
     sklearn_dataset_handler.create_dataset('binary', ['bantham'])
     X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(0.2, 3)
-
-    # Test the loaded Scikit-learn models on the dataset that they were trained on
     loaded_svm.test_model(X_test, y_test)
+    X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(0.2, 16)
     loaded_rf.test_model(X_test, y_test)
+    X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(0.2, 9)
     loaded_knn.test_model(X_test, y_test)
 
     # Test the models on the datasets that they have not been trained on
