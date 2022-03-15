@@ -7,7 +7,7 @@ from utils.train_test_utils import *
 
 ENCLOSING_FOLDER = 'binary'
 DATASETS = ['pipeline', 'lorne_point', 'noosa_heads', 'marias_beachfront', 'rocky_point']
-NUM_DATASETS_TO_LOAD = 1
+NUM_DATASETS_TO_LOAD = 5
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 5
 CONFIGS = {
@@ -25,7 +25,7 @@ CONFIGS = {
     }
 }
 SEEDS = {
-    'cnn': get_seed([1, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
+    'cnn': get_seed([1, 0, 5, 42, 23], NUM_DATASETS_TO_LOAD),
     'svm': get_seed([14, 0, 5, 42, 32], NUM_DATASETS_TO_LOAD),
     'rf': get_seed([43, 0, 0, 50, 23], NUM_DATASETS_TO_LOAD),
     'knn': get_seed([50, 0, 8, 47, 43], NUM_DATASETS_TO_LOAD)
@@ -50,7 +50,7 @@ def main():
     # train_and_test_models(models_and_seeds, ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Apply k-fold cross validation to one or more models
-    # k_fold_cross_validation([cnn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
+    # k_fold_cross_validation([cnn,svm,rf,knn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
 
     # Test the Scikit-learn models on a specified number of seeds and find the seed that each model performed best on
     # find_best_sklearn_seeds([svm, rf, knn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS, 50)

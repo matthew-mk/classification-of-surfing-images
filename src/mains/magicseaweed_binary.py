@@ -43,14 +43,14 @@ def main():
     knn = BinaryKNN()
 
     # Train a single model
-    train_and_test_model(knn, SEEDS['knn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
+    train_and_test_model(cnn, SEEDS['cnn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Train multiple models
     # models_and_seeds = [(cnn, SEEDS['cnn']), (svm, SEEDS['svm']), (rf, SEEDS['rf']), (knn, SEEDS['knn'])]
     # train_and_test_models(models_and_seeds, ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Apply k-fold cross validation to one or more models
-    # k_fold_cross_validation([cnn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
+    # k_fold_cross_validation([cnn,svm,rf,knn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
 
     # Test the models that that were trained on images from the Bantham beach on images from the other locations
     # test_saved_basic_models()
