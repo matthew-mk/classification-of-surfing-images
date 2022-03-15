@@ -1,6 +1,6 @@
 """This module trains models to classify images of surfing locations based on whether the conditions in the images are
 suitable for surfing or not (binary classification). The models can be trained using images from 1 to 5 surfing
-locations. The datasets that are used in this module contain images from Magicseaweed """
+locations. The datasets used in this module contain images from Magicseaweed """
 
 import keras.losses
 from utils.train_test_utils import *

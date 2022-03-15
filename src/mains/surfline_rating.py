@@ -1,6 +1,6 @@
 """This module trains models to classify images based on a rating of how good the conditions are (multi-class
 classification). The models are trained using images from multiple surfing locations and evaluated using appropriate
-metrics. The datasets that are used in this module contain images from Surfline. """
+metrics. The datasets used in this module contain images from Surfline. """
 
 import keras.losses
 from classes.cnn import *
