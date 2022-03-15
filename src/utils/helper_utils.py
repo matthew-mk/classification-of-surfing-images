@@ -40,23 +40,23 @@ def get_seed(seeds, num_locations):
     return seeds[num_locations - 1]
 
 
-def create_binary_bar_chart(cnn_results, svm_results, rf_results, knn_results):
-    """Creates a bar chart showing how well the binary CNN, SVM, RF, and KNN models performed based on the number of
-    locations images were used from.
+def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, y_axis_label):
+    """Creates a bar chart showing how well the CNN, SVM, RF, and KNN models performed based on the number of
+    locations images were used from in the dataset.
 
     Args:
-        cnn_results (list[int]): The results that the binary CNN model achieved per location.
-        svm_results (list[int]): The results that the binary SVM model achieved per location.
-        rf_results (list[int]): The results that the binary RF model achieved per location.
-        knn_results (list[int]): The results that the binary KNN model achieved per location.
+        cnn_results (list[int]): The results that the CNN model achieved per location.
+        svm_results (list[int]): The results that the SVM model achieved per location.
+        rf_results (list[int]): The results that the RF model achieved per location.
+        knn_results (list[int]): The results that the KNN model achieved per location.
+        title (str): The title of the bar chart.
+        y_axis_label (str): The label displayed on the y-axis of the bar chart.
 
     """
-
     red = '#ff757d'
     blue = '#4cb5f5'
     orange = '#ffb81f'
     purple = '#d472cd'
-
     x = ['1', '2', '3', '4', '5']
     cnn_results = cnn_results
     svm_results = svm_results
@@ -102,10 +102,10 @@ def create_binary_bar_chart(cnn_results, svm_results, rf_results, knn_results):
     ))
 
     fig.update_xaxes(title_text="Number of locations")
-    fig.update_yaxes(title_text="Accuracy (%)")
+    fig.update_yaxes(title_text=y_axis_label)
     fig.update_layout(barmode='group',
                       title={
-                          'text': 'Accuracy of Binary Models on Magicseaweed Datasets (Best Seeds)',
+                          'text': title,
                           'x': 0.5,
                           'xanchor': 'center',
                           'yanchor': 'top'})
