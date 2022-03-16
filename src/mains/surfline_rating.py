@@ -10,7 +10,7 @@ from utils.train_test_utils import *
 
 ENCLOSING_FOLDER = 'rating'
 DATASETS = ['pipeline', 'lorne_point', 'noosa_heads', 'marias_beachfront', 'rocky_point']
-NUM_DATASETS_TO_LOAD = 1
+NUM_DATASETS_TO_LOAD = 4
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 5
 CONFIGS = {
@@ -19,7 +19,7 @@ CONFIGS = {
         'image_width': 40,
         'color_mode': 'rgb',
         'batch_size': 16,
-        'epochs': 100
+        'epochs': 300
     },
     'sklearn': {
         'image_height': 128,
@@ -28,7 +28,7 @@ CONFIGS = {
     }
 }
 SEEDS = {
-    'cnn': get_seed([1, 0, 0, 0, 0], NUM_DATASETS_TO_LOAD),
+    'cnn': get_seed([34, 2, 20, 11, 27], NUM_DATASETS_TO_LOAD),
     'svm': get_seed([25, 16, 20, 11, 27], NUM_DATASETS_TO_LOAD),
     'rf': get_seed([34, 2, 20, 26, 27], NUM_DATASETS_TO_LOAD),
     'knn': get_seed([43, 5, 1, 36, 0], NUM_DATASETS_TO_LOAD)

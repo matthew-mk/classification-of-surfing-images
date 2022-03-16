@@ -46,6 +46,30 @@ class AbstractCNN(ABC):
         # Create the CNN model
         self.model, self.model_name = self.create_model()
 
+    def __get_y_pred(self, X_test):
+        """Predicts the labels that belong to each of the images in a dataset.
+
+        Args:
+            X_test (np.ndarray): The images in the dataset, where each image is represented as a pixel array.
+
+        Returns:
+            y_pred (np.ndarray): The predicted labels.
+
+        """
+        last_layer_index = len(self.model.layers) - 1
+        last_layer_units = self.model.get_layer(index=last_layer_index).units
+
+        if last_layer_units < 1:
+            print('Classification report could not be created. The final layer in the CNN must contain at least 1 unit.')
+            return []
+        elif last_layer_units == 1:
+            y_pred = (self.model.predict(X_test) > 0.5).astype("int32")
+        else:
+            y_probabilities = self.model.predict(X_test)
+            y_pred = tf.argmax(y_probabilities, axis=-1)
+
+        return y_pred
+
     def print_model_name(self):
         """Prints the name of the model."""
         print("\n" + self.model_name)
@@ -58,18 +82,8 @@ class AbstractCNN(ABC):
             y_test (np.ndarray): The labels in the dataset.
 
         """
-        last_layer_index = len(self.model.layers) - 1
-        last_layer_units = self.model.get_layer(index=last_layer_index).units
 
-        if last_layer_units < 1:
-            print('Classification report could not be created. The final layer in the CNN must contain at least 1 unit.')
-            return
-        elif last_layer_units == 1:
-            y_pred = (self.model.predict(X_test) > 0.5).astype("int32")
-        else:
-            y_probabilities = self.model.predict(X_test)
-            y_pred = tf.argmax(y_probabilities, axis=-1)
-
+        y_pred = self.__get_y_pred(X_test)
         print('Classification report:')
         print(classification_report(y_test, y_pred))
 
@@ -180,12 +194,14 @@ class AbstractCNN(ABC):
         plt.ylabel('Truth')
         plt.show()
 
-    def test_model(self, X_test, y_test):
+    def test_model(self, X_test, y_test, return_acc=False):
         """Tests the model on a dataset and prints the accuracy, number of correct predictions, and loss.
 
         Args:
             X_test (np.ndarray): The images in the dataset, where each image is represented as a pixel array.
             y_test (np.ndarray): The labels in the dataset.
+            return_acc (bool): Optional variable, defaults to False. If set to true, it will return the accuracy that
+                the model scored on the provided dataset.
 
         """
         try:
@@ -198,6 +214,8 @@ class AbstractCNN(ABC):
         print(f'Accuracy: {round(acc * 100, 2)}%')
         print(f'Number of correct predictions: {round(len(X_test) * acc)}/{len(X_test)}')
         self.print_classification_report(X_test, y_test)
+        if return_acc:
+            return round(acc * 100, 2)
 
     def save_model(self, model_name):
         """Saves the current CNN model in the 'saved_models' folder.
@@ -226,26 +244,76 @@ class AbstractCNN(ABC):
                 E.g. 0.2 means 20% of images will be used for testing.
 
         """
+        # Initialise variables
         skf = StratifiedShuffleSplit(n_splits=n_splits, test_size=test_size)
         X = np.array(X)
         y = np.array(y)
         default_weights = self.model.get_weights()
         fold_num = 1
 
+        # Set up the overall results dictionary
+        categories = np.unique(y)
+        overall_results = {
+            'accuracy': []
+        }
+        for category in categories:
+            overall_results[f'{category}'] = {
+                'precision': [],
+                'recall': []
+        }
+
+        # Perform K-fold cross validation
         for train_index, test_index in skf.split(X, y):
             # Set up training, validation, and test datasets for the current fold
             X = X.reshape(len(X), self.image_height, self.image_width, self.num_channels)
             X_train, X_test, y_train, y_test = X[train_index], X[test_index], y[train_index], y[test_index]
             X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2)
 
-            # Train and test the model on the current fold
+            # Train the model on the current fold's training data, then test the model on the current fold's test data
             print(f'\nTraining on fold {fold_num}...')
             self.model.set_weights(default_weights)
             self.train_model(X_train, X_val, y_train, y_val)
-            print(f'\nFold {fold_num} test dataset results:')
-            self.test_model(X_test, y_test)
+            current_fold_accuracy = self.test_model(X_test, y_test, return_acc=True)
+
+            # Add the results from the current fold to the overall results dictionary
+            overall_results['accuracy'].append(current_fold_accuracy)
+            y_pred = self.__get_y_pred(X_test)
+            classification_report_dict = classification_report(y_test, y_pred, output_dict=True)
+            for category in categories:
+                category_precision = classification_report_dict[f'{category}']['precision']
+                category_precision = round(category_precision * 100, 2)
+                category_recall = classification_report_dict[f'{category}']['recall']
+                category_recall = round(category_recall * 100, 2)
+                overall_results[f'{category}']['precision'].append(category_precision)
+                overall_results[f'{category}']['recall'].append(category_recall)
             fold_num += 1
 
+        # Print the overall results taking into account all folds
+        print('\n---------------------------------------------------------\n')
+        print(f'Overall K-Fold Cross Validation Results: {self.model_name}')
+        accuracy_scores = overall_results['accuracy']
+        print(f'\nAccuracy: {accuracy_scores}')
+        average_accuracy_scores = round(np.average(accuracy_scores), 2)
+        print(f'Average accuracy: {average_accuracy_scores}%')
+        print('\nPrecision per category:')
+        for category in categories:
+            category_precision = overall_results[f'{category}']['precision']
+            print(f'{category}: precision={category_precision}')
+        print('\nAverage precision per category:')
+        for category in categories:
+            category_precision = overall_results[f'{category}']['precision']
+            average_precision = round(np.average(category_precision), 2)
+            print(f'{category}: precision={average_precision}')
+        print('\nRecall per category:')
+        for category in categories:
+            category_recall = overall_results[f'{category}']['recall']
+            print(f'{category}: recall={category_recall}')
+        print('\nAverage recall per category:')
+        for category in categories:
+            category_recall = overall_results[f'{category}']['recall']
+            average_recall = round(np.average(category_recall), 2)
+            print(f'{category}: recall={average_recall}')
+        print('\n---------------------------------------------------------\n')
 
 class LoadedCNN(AbstractCNN):
     """A loaded Keras CNN model."""
