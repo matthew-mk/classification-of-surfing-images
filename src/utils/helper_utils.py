@@ -41,7 +41,7 @@ def get_seed(seeds, num_locations):
     return seeds[num_locations - 1]
 
 
-def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
+def create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
                                 y_axis_label):
     """Creates a bar chart showing how well the CNN, SVM, RF, and KNN models performed based on the number of
     locations images were used from in the dataset.
@@ -61,15 +61,10 @@ def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_result
     blue = '#4cb5f5'
     orange = '#ffb81f'
     purple = '#d472cd'
-    x = x_labels
-    cnn_results = cnn_results
-    svm_results = svm_results
-    rf_results = rf_results
-    knn_results = knn_results
 
     fig = go.Figure()
     fig.add_trace(go.Bar(
-        x=x,
+        x=x_labels,
         y=cnn_results,
         name='CNN',
         marker_color=red,
@@ -78,7 +73,7 @@ def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_result
         texttemplate='%{text:.3}'
     ))
     fig.add_trace(go.Bar(
-        x=x,
+        x=x_labels,
         y=svm_results,
         name='SVM',
         marker_color=blue,
@@ -87,7 +82,7 @@ def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_result
         texttemplate='%{text:.3}'
     ))
     fig.add_trace(go.Bar(
-        x=x,
+        x=x_labels,
         y=rf_results,
         name='RF',
         marker_color=orange,
@@ -96,7 +91,7 @@ def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_result
         texttemplate='%{text:.3}'
     ))
     fig.add_trace(go.Bar(
-        x=x,
+        x=x_labels,
         y=knn_results,
         name='KNN',
         marker_color=purple,
@@ -109,6 +104,39 @@ def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_result
     fig.update_yaxes(title_text=y_axis_label)
     fig.update_layout(barmode='group',
                       title={
+                          'text': title,
+                          'x': 0.5,
+                          'xanchor': 'center',
+                          'yanchor': 'top'})
+    fig.show()
+
+def create_evaluation_bar_chart_2(results, title, y_axis_label):
+    """Creates a bar chart.
+
+    Args:
+        results (list[int]): The results that the models achieved.
+        title (str): The title of the bar chart.
+        y_axis_label (str): The label displayed on the y-axis of the bar chart.
+
+    """
+    red = '#ff757d'
+    blue = '#4cb5f5'
+    orange = '#ffb81f'
+    purple = '#d472cd'
+
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=['CNN', 'SVM', 'RF', 'KNN'],
+        y=results,
+        marker_color=[red, blue, orange, purple],
+        text=results,
+        textposition='outside',
+        texttemplate='%{text:.3}'
+    ))
+
+    fig.update_xaxes(title_text='Models')
+    fig.update_yaxes(title_text=y_axis_label)
+    fig.update_layout(title={
                           'text': title,
                           'x': 0.5,
                           'xanchor': 'center',

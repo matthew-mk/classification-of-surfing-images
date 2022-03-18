@@ -2,7 +2,7 @@
 stage of the project. K-fold cross validation was applied to the models using the binary and rating datasets from
 Magicseaweed and Surfline that contained images from 5 surfing locations. """
 
-from utils.helper_utils import create_evaluation_bar_chart
+from utils.helper_utils import create_evaluation_bar_chart_1, create_evaluation_bar_chart_2
 
 
 def magicseaweed_binary_kfold_results_chart():
@@ -19,7 +19,7 @@ def magicseaweed_binary_kfold_results_chart():
     x_labels = ['Accuracy', 'Precision', 'Recall']
     x_axis_label = 'Performance metrics'
     y_axis_label = 'Percentage'
-    create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
+    create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
                                 y_axis_label)
 
 
@@ -37,7 +37,7 @@ def surfline_binary_kfold_results_chart():
     x_labels = ['Accuracy', 'Precision', 'Recall']
     x_axis_label = 'Performance metrics'
     y_axis_label = 'Percentage'
-    create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
+    create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
                                 y_axis_label)
 
 
@@ -47,16 +47,10 @@ def magicseaweed_rating_kfold_accuracy_chart():
     surfing. This function creates a bar chart showing the average accuracy the CNN, SVM, RF, and KNN models achieved
     when 5-fold was applied to them using this dataset.
     """
-    cnn_results = [63]
-    svm_results = [58]
-    rf_results = [57]
-    knn_results = [35]
+    results = [63, 58, 57, 35]
     title = '5-Fold Cross Validation Average Accuracy on Magicseaweed Rating Datasets (5 locations)'
-    x_labels = ['Accuracy']
-    x_axis_label = 'Performance metric'
-    y_axis_label = 'Percentage'
-    create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+    y_axis_label = 'Accuracy (%)'
+    create_evaluation_bar_chart_2(results, title, y_axis_label)
 
 
 def magicseaweed_rating_kfold_precision_chart():
@@ -74,7 +68,7 @@ def magicseaweed_rating_kfold_precision_chart():
     x_labels = ['Flat', 'Poor', 'Fair', 'Good', 'Epic']
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
-    create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
+    create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
                                 y_axis_label)
 
 
@@ -93,7 +87,7 @@ def magicseaweed_rating_kfold_recall_chart():
     x_labels = ['Flat', 'Poor', 'Fair', 'Good', 'Epic']
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
-    create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
+    create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
                                 y_axis_label)
 
 
@@ -103,16 +97,11 @@ def surfline_rating_kfold_accuracy_chart():
     surfing. This function creates a bar chart showing the average accuracy the CNN, SVM, RF, and KNN models achieved
     when 5-fold was applied to them using this dataset.
     """
-    cnn_results = [62]
-    svm_results = [62]
-    rf_results = [57]
-    knn_results = [39]
+
     title = '5-Fold Cross Validation Average Accuracy on Surfline Rating Datasets (5 locations)'
-    x_labels = ['Accuracy']
-    x_axis_label = 'Performance metric'
-    y_axis_label = 'Percentage'
-    create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+    results = [62, 62, 57, 39]
+    y_axis_label = 'Accuracy (%)'
+    create_evaluation_bar_chart_2(results, title, y_axis_label)
 
 
 def surfline_rating_kfold_precision_chart():
@@ -130,7 +119,7 @@ def surfline_rating_kfold_precision_chart():
     x_labels = ['Flat', 'Poor', 'Fair', 'Good', 'Epic']
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
-    create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
+    create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
                                 y_axis_label)
 
 
@@ -149,19 +138,19 @@ def surfline_rating_kfold_recall_chart():
     x_labels = ['Flat', 'Poor', 'Fair', 'Good', 'Epic']
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
-    create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
+    create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
                                 y_axis_label)
 
 
 def main():
     # 5-Fold Cross Validation Average Results on Magicseaweed Binary Datasets (5 locations)
-    magicseaweed_binary_kfold_results_chart()
+    # magicseaweed_binary_kfold_results_chart()
 
     # 5-Fold Cross Validation Average Results on Surfline Binary Datasets (5 locations)
     # surfline_binary_kfold_results_chart()
 
     # 5-Fold Cross Validation Average Accuracy on Magicseaweed Rating Datasets (5 locations)
-    # magicseaweed_rating_kfold_accuracy_chart()
+    magicseaweed_rating_kfold_accuracy_chart()
 
     # 5-Fold Cross Validation Average Precision on Magicseaweed Rating Datasets (5 locations)
     # magicseaweed_rating_kfold_precision_chart()
@@ -170,7 +159,7 @@ def main():
     # magicseaweed_rating_kfold_recall_chart()
 
     # 5-Fold Cross Validation Average Accuracy on Surfline Rating Datasets (5 locations)
-    # surfline_rating_kfold_accuracy_chart()
+    surfline_rating_kfold_accuracy_chart()
 
     # 5-Fold Cross Validation Average Precision on Surfline Rating Datasets (5 locations)
     # surfline_rating_kfold_precision_chart()
