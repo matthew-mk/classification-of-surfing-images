@@ -42,7 +42,7 @@ def get_seed(seeds, num_locations):
 
 
 def create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label):
+                                  y_axis_label):
     """Creates a bar chart showing how well the CNN, SVM, RF, and KNN models performed based on the number of
     locations images were used from in the dataset.
 
@@ -62,7 +62,7 @@ def create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_resu
     orange = '#ffb81f'
     purple = '#d472cd'
 
-    fig = go.Figure()
+    fig = go.Figure(layout_yaxis_range=[0, 108])
     fig.add_trace(go.Bar(
         x=x_labels,
         y=cnn_results,
@@ -110,6 +110,7 @@ def create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_resu
                           'yanchor': 'top'})
     fig.show()
 
+
 def create_evaluation_bar_chart_2(results, title, y_axis_label):
     """Creates a bar chart.
 
@@ -124,7 +125,7 @@ def create_evaluation_bar_chart_2(results, title, y_axis_label):
     orange = '#ffb81f'
     purple = '#d472cd'
 
-    fig = go.Figure()
+    fig = go.Figure(layout_yaxis_range=[0, 108])
     fig.add_trace(go.Bar(
         x=['CNN', 'SVM', 'RF', 'KNN'],
         y=results,
@@ -137,8 +138,8 @@ def create_evaluation_bar_chart_2(results, title, y_axis_label):
     fig.update_xaxes(title_text='Models')
     fig.update_yaxes(title_text=y_axis_label)
     fig.update_layout(title={
-                          'text': title,
-                          'x': 0.5,
-                          'xanchor': 'center',
-                          'yanchor': 'top'})
+        'text': title,
+        'x': 0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'})
     fig.show()

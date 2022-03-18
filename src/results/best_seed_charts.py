@@ -19,7 +19,7 @@ def magicseaweed_binary_accuracy_chart():
     x_axis_label = 'Number of locations'
     y_axis_label = 'Accuracy (%)'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_binary_precision_chart():
@@ -37,7 +37,7 @@ def magicseaweed_binary_precision_chart():
     x_axis_label = 'Number of locations'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_binary_recall_chart():
@@ -55,7 +55,7 @@ def magicseaweed_binary_recall_chart():
     x_axis_label = 'Number of locations'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_binary_accuracy_chart():
@@ -73,7 +73,7 @@ def surfline_binary_accuracy_chart():
     x_axis_label = 'Number of locations'
     y_axis_label = 'Accuracy (%)'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_binary_precision_chart():
@@ -91,7 +91,7 @@ def surfline_binary_precision_chart():
     x_axis_label = 'Number of locations'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_binary_recall_chart():
@@ -109,7 +109,7 @@ def surfline_binary_recall_chart():
     x_axis_label = 'Number of locations'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_accuracy_chart():
@@ -127,7 +127,7 @@ def magicseaweed_rating_accuracy_chart():
     x_axis_label = 'Number of locations'
     y_axis_label = 'Accuracy (%)'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_precision_1_chart():
@@ -145,7 +145,7 @@ def magicseaweed_rating_precision_1_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_precision_2_chart():
@@ -164,7 +164,7 @@ def magicseaweed_rating_precision_2_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_precision_3_chart():
@@ -183,7 +183,7 @@ def magicseaweed_rating_precision_3_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_precision_4_chart():
@@ -202,7 +202,7 @@ def magicseaweed_rating_precision_4_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_precision_5_chart():
@@ -221,7 +221,7 @@ def magicseaweed_rating_precision_5_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_recall_1_chart():
@@ -239,7 +239,7 @@ def magicseaweed_rating_recall_1_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_recall_2_chart():
@@ -258,7 +258,7 @@ def magicseaweed_rating_recall_2_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_recall_3_chart():
@@ -277,7 +277,8 @@ def magicseaweed_rating_recall_3_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
+
 
 def magicseaweed_rating_recall_4_chart():
     """CNN, SVM, RF, and KNN models were trained and tested on datasets that contained images of up to 5 surfing
@@ -295,7 +296,7 @@ def magicseaweed_rating_recall_4_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def magicseaweed_rating_recall_5_chart():
@@ -314,7 +315,7 @@ def magicseaweed_rating_recall_5_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_accuracy_chart():
@@ -332,7 +333,7 @@ def surfline_rating_accuracy_chart():
     x_axis_label = 'Number of locations'
     y_axis_label = 'Accuracy (%)'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_precision_1_chart():
@@ -350,7 +351,7 @@ def surfline_rating_precision_1_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_precision_2_chart():
@@ -369,7 +370,7 @@ def surfline_rating_precision_2_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_precision_3_chart():
@@ -388,7 +389,7 @@ def surfline_rating_precision_3_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_precision_4_chart():
@@ -407,7 +408,7 @@ def surfline_rating_precision_4_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_precision_5_chart():
@@ -426,7 +427,7 @@ def surfline_rating_precision_5_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Precision'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_recall_1_chart():
@@ -444,7 +445,7 @@ def surfline_rating_recall_1_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_recall_2_chart():
@@ -463,7 +464,7 @@ def surfline_rating_recall_2_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_recall_3_chart():
@@ -482,7 +483,7 @@ def surfline_rating_recall_3_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_recall_4_chart():
@@ -501,7 +502,7 @@ def surfline_rating_recall_4_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def surfline_rating_recall_5_chart():
@@ -520,7 +521,7 @@ def surfline_rating_recall_5_chart():
     x_axis_label = 'Category'
     y_axis_label = 'Recall'
     create_evaluation_bar_chart_1(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
-                                y_axis_label)
+                                  y_axis_label)
 
 
 def main():
