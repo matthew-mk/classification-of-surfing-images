@@ -7,7 +7,7 @@ from utils.train_test_utils import *
 
 ENCLOSING_FOLDER = 'binary'
 DATASETS = ['bantham', 'polzeath', 'porthowan', 'praa_sands', 'widemouth_bay']
-NUM_DATASETS_TO_LOAD = 1
+NUM_DATASETS_TO_LOAD = 5
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 5
 CONFIGS = {

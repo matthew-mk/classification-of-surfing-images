@@ -288,7 +288,7 @@ class AbstractCNN(ABC):
                 overall_results[f'{category}']['recall'].append(category_recall)
             fold_num += 1
 
-        # Print the overall results taking into account all folds
+        # Print the overall results
         print('\n---------------------------------------------------------\n')
         print(f'Overall K-Fold Cross Validation Results: {self.model_name}')
         accuracy_scores = overall_results['accuracy']

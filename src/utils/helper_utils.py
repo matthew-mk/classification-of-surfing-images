@@ -2,6 +2,7 @@
 
 import plotly.graph_objects as go
 
+
 def get_channels(color_mode):
     """Returns the number of channels that a color mode has.
 
@@ -40,7 +41,8 @@ def get_seed(seeds, num_locations):
     return seeds[num_locations - 1]
 
 
-def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, y_axis_label):
+def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_results, title, x_labels, x_axis_label,
+                                y_axis_label):
     """Creates a bar chart showing how well the CNN, SVM, RF, and KNN models performed based on the number of
     locations images were used from in the dataset.
 
@@ -50,6 +52,8 @@ def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_result
         rf_results (list[int]): The results that the RF model achieved per location.
         knn_results (list[int]): The results that the KNN model achieved per location.
         title (str): The title of the bar chart.
+        x_labels (list[str]): Five labels that will be shown along the x-axis of the bar chart.
+        x_axis_label (str): The label displayed on the y-axis of the bar chart.
         y_axis_label (str): The label displayed on the y-axis of the bar chart.
 
     """
@@ -57,7 +61,7 @@ def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_result
     blue = '#4cb5f5'
     orange = '#ffb81f'
     purple = '#d472cd'
-    x = ['1', '2', '3', '4', '5']
+    x = x_labels
     cnn_results = cnn_results
     svm_results = svm_results
     rf_results = rf_results
@@ -101,7 +105,7 @@ def create_evaluation_bar_chart(cnn_results, svm_results, rf_results, knn_result
         texttemplate='%{text:.3}'
     ))
 
-    fig.update_xaxes(title_text="Number of locations")
+    fig.update_xaxes(title_text=x_axis_label)
     fig.update_yaxes(title_text=y_axis_label)
     fig.update_layout(barmode='group',
                       title={

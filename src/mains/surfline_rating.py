@@ -10,7 +10,7 @@ from utils.train_test_utils import *
 
 ENCLOSING_FOLDER = 'rating'
 DATASETS = ['pipeline', 'lorne_point', 'noosa_heads', 'marias_beachfront', 'rocky_point']
-NUM_DATASETS_TO_LOAD = 4
+NUM_DATASETS_TO_LOAD = 5
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 5
 CONFIGS = {
@@ -49,7 +49,7 @@ def main():
     train_and_test_model(cnn, SEEDS['cnn'], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Train multiple models
-    # models_and_seeds = [(svm, SEEDS['svm']), (rf, SEEDS['rf']), (knn, SEEDS['knn'])]
+    # models_and_seeds = [(cnn, SEEDS['cnn']), (svm, SEEDS['svm']), (rf, SEEDS['rf']), (knn, SEEDS['knn'])]
     # train_and_test_models(models_and_seeds, ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS)
 
     # Apply k-fold cross validation to one or more models
