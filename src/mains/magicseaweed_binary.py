@@ -52,8 +52,8 @@ def main():
     # Apply k-fold cross validation to one or more models
     # k_fold_cross_validation([cnn,svm,rf,knn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
 
-    # Test the models that that were trained on images from the Bantham beach on images from the other locations
-    # test_saved_basic_models()
+    # Test the models that that were trained on images from the Bantham Beach on images from the other locations
+    # test_binary_bantham_models()
 
     # Test the Scikit-learn models on a specified number of seeds and find the seed that each model performed best on
     # find_best_sklearn_seeds([svm, rf, knn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS, 50)

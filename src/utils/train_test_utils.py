@@ -153,9 +153,9 @@ def find_best_sklearn_seeds(models, enclosing_folder, datasets_to_load, test_siz
         print(f"seed={best_seed}, accuracy={best_acc}%")
 
 
-def test_saved_basic_models():
+def test_binary_bantham_models():
     """Loads the models that were trained on images from a single surfing location (Bantham beach) and tests their
-    performance on images from other locations."""
+    performance on images from other Magicseaweed locations."""
 
     # Configuration settings for the models
     configs = {
@@ -164,7 +164,7 @@ def test_saved_basic_models():
             'image_width': 40,
             'color_mode': 'rgb',
             'batch_size': 16,
-            'epochs': 10
+            'epochs': 50
         },
         'sklearn': {
             'image_height': 128,
@@ -175,15 +175,15 @@ def test_saved_basic_models():
 
     # Load the models
     loaded_cnn = LoadedCNN(configs['cnn'])
-    loaded_cnn.load_model('basic_cnn')
+    loaded_cnn.load_model('binary_bantham_cnn')
     loaded_svm = LoadedSklearn()
-    loaded_svm.load_model('basic_svm')
+    loaded_svm.load_model('binary_bantham_svm')
     loaded_rf = LoadedSklearn()
-    loaded_rf.load_model('basic_rf')
+    loaded_rf.load_model('binary_bantham_rf')
     loaded_knn = LoadedSklearn()
-    loaded_knn.load_model('basic_knn')
+    loaded_knn.load_model('binary_bantham_knn')
 
-    # Setup datasets for the loaded CNN models and test them
+    # Setup datasets for the loaded CNN model and test it
     cnn_dataset_handler = CNNDatasetHandler(configs['cnn'])
     cnn_dataset_handler.create_dataset('binary', ['bantham'])
     print('\nPerformance on bantham dataset (the dataset the models were trained on):')
@@ -202,6 +202,77 @@ def test_saved_basic_models():
 
     # Test the models on the datasets that they have not been trained on
     datasets_to_load = ['polzeath', 'porthowan', 'praa_sands', 'widemouth_bay']
+    for dataset_name in datasets_to_load:
+        print("\n-----------------------------------------")
+        print(f'\nPerformance on {dataset_name} dataset:')
+
+        # Set up dataset for CNN model
+        cnn_dataset_handler.create_dataset('binary', [dataset_name])
+
+        # Get the images and labels
+        X_test, y_test = cnn_dataset_handler.get_X_and_y()
+
+        # Test CNN model
+        loaded_cnn.test_model(X_test, y_test)
+
+        # Set up dataset for Scikit-learn models
+        sklearn_dataset_handler.create_dataset('binary', [dataset_name])
+        X_test, y_test = sklearn_dataset_handler.get_X_and_y()
+
+        # Test Scikit-learn models
+        loaded_svm.test_model(X_test, y_test)
+        loaded_rf.test_model(X_test, y_test)
+        loaded_knn.test_model(X_test, y_test)
+
+def test_binary_pipeline_models():
+    """Loads the models that were trained on images from a single surfing location (Bantham beach) and tests their
+    performance on images from other Surfline locations."""
+
+    # Configuration settings for the models
+    configs = {
+        'cnn': {
+            'image_height': 40,
+            'image_width': 40,
+            'color_mode': 'rgb',
+            'batch_size': 16,
+            'epochs': 50
+        },
+        'sklearn': {
+            'image_height': 128,
+            'image_width': 128,
+            'color_mode': 'rgb'
+        }
+    }
+
+    # Load the models
+    loaded_cnn = LoadedCNN(configs['cnn'])
+    loaded_cnn.load_model('binary_pipeline_cnn')
+    loaded_svm = LoadedSklearn()
+    loaded_svm.load_model('binary_pipeline_svm')
+    loaded_rf = LoadedSklearn()
+    loaded_rf.load_model('binary_pipeline_rf')
+    loaded_knn = LoadedSklearn()
+    loaded_knn.load_model('binary_pipeline_knn')
+
+    # Setup datasets for the loaded CNN model and test it
+    cnn_dataset_handler = CNNDatasetHandler(configs['cnn'])
+    cnn_dataset_handler.create_dataset('binary', ['pipeline'])
+    print('\nPerformance on pipeline dataset (the dataset the models were trained on):')
+    X_train, X_val, X_test, y_train, y_val, y_test = cnn_dataset_handler.train_test_split(0.2, 1, 1)
+    loaded_cnn.test_model(X_test, y_test)
+
+    # Setup datasets for the loaded Scikit-learn models
+    sklearn_dataset_handler = SklearnDatasetHandler(configs['sklearn'])
+    sklearn_dataset_handler.create_dataset('binary', ['pipeline'])
+    X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(0.2, 14)
+    loaded_svm.test_model(X_test, y_test)
+    X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(0.2, 43)
+    loaded_rf.test_model(X_test, y_test)
+    X_train, X_test, y_train, y_test = sklearn_dataset_handler.train_test_split(0.2, 50)
+    loaded_knn.test_model(X_test, y_test)
+
+    # Test the models on the datasets that they have not been trained on
+    datasets_to_load = ['lorne_point', 'noosa_heads', 'marias_beachfront', 'rocky_point']
     for dataset_name in datasets_to_load:
         print("\n-----------------------------------------")
         print(f'\nPerformance on {dataset_name} dataset:')

@@ -7,7 +7,7 @@ from utils.train_test_utils import *
 
 ENCLOSING_FOLDER = 'binary'
 DATASETS = ['pipeline', 'lorne_point', 'noosa_heads', 'marias_beachfront', 'rocky_point']
-NUM_DATASETS_TO_LOAD = 5
+NUM_DATASETS_TO_LOAD = 1
 TEST_SIZE = 0.2
 K_FOLD_SPLITS = 5
 CONFIGS = {
@@ -51,6 +51,9 @@ def main():
 
     # Apply k-fold cross validation to one or more models
     # k_fold_cross_validation([cnn,svm,rf,knn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, K_FOLD_SPLITS, TEST_SIZE, CONFIGS)
+
+    # Test the models that that were trained on images from Pipeline on images from the other Surfline locations
+    # test_binary_pipeline_models()
 
     # Test the Scikit-learn models on a specified number of seeds and find the seed that each model performed best on
     # find_best_sklearn_seeds([svm, rf, knn], ENCLOSING_FOLDER, DATASETS_TO_LOAD, TEST_SIZE, CONFIGS, 50)
