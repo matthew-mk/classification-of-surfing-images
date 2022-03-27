@@ -18,8 +18,8 @@ An object-oriented system that can be used to create, train, test, and evaluate 
     │   └── sklearn.py                      - Classes for creating models using Scikit-learn.
     │
     ├── mains	      	                    - The 'main' files where models are initialized, trained, tested, and evaluated.
-    ├── results	      	                    - Contains charts that display the results gathered during the project.
-    ├── tests	      	                    - Contains unit tests.
+    ├── results	      	                    - Charts that display the results gathered during the evaluation process.
+    ├── tests	      	                    - Unit tests.
     └── utils
         ├── helper_utils.py                 - Utility functions that help with various parts of the system.
         └── train_test_utils.py             - Utility functions for training, testing, and evaluating models.
