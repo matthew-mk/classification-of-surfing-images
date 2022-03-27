@@ -47,8 +47,7 @@ class AbstractDatasetHandler(ABC):
         elif enclosing_folder == 'rating':
             return ['1', '2', '3', '4', '5']
         else:
-            print("An invalid input was given. Must be 'binary' or 'rating'.")
-            return []
+            raise ValueError("An invalid input was given. Must be 'binary' or 'rating'.")
 
     def create_dataset(self, enclosing_folder, datasets_to_load, print_info=False):
         """Loads images from one or more datasets, does some preprocessing, and merges them into one dataset.

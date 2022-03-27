@@ -228,7 +228,7 @@ class AbstractCNN(ABC):
             self.model.save('../../saved_models/{}.h5'.format(model_name))
             self.model_name = model_name
         else:
-            print('The model could not be saved. An invalid name was used.')
+            raise ValueError('The model could not be saved. An invalid name was used.')
 
     def kfold_cross_validation(self, X, y, n_splits, test_size):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.

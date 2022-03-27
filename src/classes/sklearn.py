@@ -1,8 +1,7 @@
 """This module defines an abstract base class that contains common functionality for Scikit-learn models. There are also
 subclasses that inherit from the base class, including particular implementations of SVM, RF, and KNN models. """
-import copy
 
-from sklearn.base import clone
+import copy
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.svm import SVC
@@ -102,10 +101,11 @@ class AbstractSklearn(ABC):
 
         """
         if isinstance(model_name, str) and len(model_name) > 0 and str.isspace(model_name) is False:
-            pickle.dump(self.model, open('../../saved_models/{}.sav'.format(model_name), 'wb'))
+            with open('../../saved_models/{}.sav'.format(model_name), 'wb') as f:
+                pickle.dump(self.model, f)
             self.model_name = model_name
         else:
-            print('The model could not be saved. An invalid name was used.')
+            raise ValueError('The model could not be saved. An invalid name was used.')
 
     def kfold_cross_validation(self, X, y, n_splits, test_size):
         """K-Fold Cross Validation is applied to the model and info about accuracy, precision, and recall is printed.
@@ -214,7 +214,8 @@ class LoadedSklearn(AbstractSklearn):
 
         """
         try:
-            self.model = pickle.load(open('../../saved_models/{}.sav'.format(model_name), 'rb'))
+            with open('../../saved_models/{}.sav'.format(model_name), 'rb') as f:
+                self.model = pickle.load(f)
             self.model_name = model_name
         except TypeError as e:
             print('Model could not be loaded')
