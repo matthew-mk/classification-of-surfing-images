@@ -32,7 +32,7 @@ class TestSaveAndLoad(unittest.TestCase):
         os.remove('../../saved_models/unit_test_model.sav')
         self.assertTrue(type(saved_svm.model) is type(loaded_svm.model))
 
-    def test_save_and_load_raises(self):
+    def test_save_raises(self):
         with self.assertRaises(ValueError):
             model = BinaryCNN({'image_height': 40,
                                'image_width': 40,
