@@ -33,11 +33,13 @@ The instructions assume that PyCharm is used as the IDE. If you do not currently
 2. Open the ‘matthew_king_fourth_year_project’ folder in PyCharm.
 3. Click on &lt;No interpreter&gt; in the bottom right hand corner and select ‘Add environment’.
 4. Select ‘Conda Environment’.
-5. Select ‘New environment’ and use Python version 3.8. Click OK to set this as the interpreter.
-6. Open the PyCharm terminal window.
-7. Enter the following command into the PyCharm terminal to install the dependencies: `pip install -r requirements.txt`
-8. If any of the dependencies do not install correctly, then try to install them individually. For example, tensorflow can be installed by using `pip install tensorflow==2.7.0` or `pip install tensorflow —upgrade`
-9. Wait for PyCharm to finish indexing.
-10. Right click on the ‘src’ folder, scroll down to ‘Mark Directory as’, and ensure it is marked as the sources root.
-11. Open one of the files in the 'mains' folder, such as `magicseaweed_binary.py`
-12. Uncomment one of the functions inside of the main() function and run the file (in each of the files the train_and_test_model() function has already been uncommented)
+5. Select ‘New environment’ and use Python version 3.8.
+6. Click OK to set this as the interpreter.
+7. Open the PyCharm terminal window.
+8. Ensure you are in the conda environment that you just created. If you are not, then type `conda activate environment_name`, where environtment_name is the name of the environment you created.
+9. Enter the following command into the PyCharm terminal to install the dependencies: `pip install -r requirements.txt`
+10. If any of the dependencies do not install correctly, then try to install them individually. For example, tensorflow can be installed by using `pip install tensorflow==2.7.0` or `pip install tensorflow —upgrade`
+11. Wait for PyCharm to finish indexing.
+12. Right click on the `src` folder, scroll down to ‘Mark Directory as’, and ensure it is marked as the sources root.
+13. Open one of the files in the `mains` folder, such as `magicseaweed_binary.py`
+14. Uncomment one of the functions inside of the `main()` function and run the file (in each of the files the `train_and_test_model()` function has already been uncommented)
