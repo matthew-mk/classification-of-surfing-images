@@ -273,6 +273,7 @@ class AbstractCNN(ABC):
             print(f'\nTraining on fold {fold_num}...')
             self.model.set_weights(default_weights)
             self.train_model(X_train, X_val, y_train, y_val)
+            print(f'\nFold {fold_num} test dataset results:')
             current_fold_accuracy = self.test_model(X_test, y_test, return_acc=True)
 
             # Add the results from the current fold to the overall results dictionary
