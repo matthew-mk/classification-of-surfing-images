@@ -38,7 +38,7 @@ The instructions assume that PyCharm is used as the IDE. If you do not currently
 7. Open the PyCharm terminal window.
 8. Ensure you are in the conda environment that you just created. If you are not, then type `conda activate environment_name`, where environtment_name is the name of the environment you created.
 9. Enter the following command into the PyCharm terminal to install the dependencies: `pip install -r requirements.txt`
-10. If any of the dependencies do not install correctly, then try to install them individually. For example, tensorflow can be installed by using `pip install tensorflow==2.7.0` or `pip install tensorflow —upgrade`
+10. If any of the dependencies do not install correctly, then try to install them individually. For example, tensorflow can be installed by using `pip install tensorflow==2.7.0` or `pip install tensorflow --upgrade`
 11. Wait for PyCharm to finish indexing.
 12. Right click on the `src` folder, scroll down to ‘Mark Directory as’, and ensure it is marked as the sources root.
 13. Open one of the files in the `mains` folder, such as `magicseaweed_binary.py`
